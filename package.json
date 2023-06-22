@@ -4,6 +4,10 @@
   "main": "./dist/cli/cli.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
+  "files": [
+    "/dist",
+    "/src"
+  ],
   "author": {
     "email": "jorasmhj@gmail.com",
     "name": "Saroj Maharjan",
