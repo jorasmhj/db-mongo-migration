@@ -1,5 +1,5 @@
 {
-  "name": "saroj-test-library",
+  "name": "saroj-test-lib",
   "version": "1.0.0",
   "main": "./src/cli/index.js",
   "license": "MIT",
