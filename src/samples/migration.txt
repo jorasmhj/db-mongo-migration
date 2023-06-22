@@ -1,0 +1,16 @@
+import { IMigration } from '../interface'
+import DB from '../lib/helpers/db-helper'
+
+class Migration implements IMigration {
+  /**
+   * Run the migrations.
+   */
+  async up(db: DB) {}
+
+  /**
+   * Reverse the migrations.
+   */
+  async down(db: DB) {}
+}
+
+export default Migration

@@ -1,0 +1,13 @@
+{
+  "db-connection": {
+    "url": "mongodb+srv://novelty:8RrZFTAxFtjGUG5x@cluster0.befc3.mongodb.net/?retryWrites=true&w=majority",
+    "databaseName": "qa_gold",
+    "options": {
+      "useNewUrlParser": true,
+      "useUnifiedTopology": true
+    }
+  },
+  "useFileHash": false,
+  "migrationsDir": "src/migrations",
+  "changelogCollectionName": "migrations"
+}

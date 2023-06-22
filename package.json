@@ -1,0 +1,36 @@
+{
+  "name": "saroj-test-library",
+  "version": "1.0.0",
+  "main": "./src/cli/index.js",
+  "license": "MIT",
+  "author": {
+    "email": "jorasmhj@gmail.com",
+    "name": "Saroj Maharjan",
+    "url": "https://github.com/jorasmhj"
+  },
+  "bin": {
+    "mongo-migrate": "./src/cli/index.js"
+  },
+  "scripts": {
+    "build": "rimraf dist/ && tsc -p . && copyfiles -u 1 src/**/*.txt dist/",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.6.5",
+    "@commitlint/config-conventional": "^17.6.5",
+    "@types/figlet": "^1.5.6",
+    "@types/node": "^20.3.1",
+    "commitizen": "^4.3.0",
+    "copyfiles": "^2.4.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^8.0.3",
+    "rimraf": "^5.0.1",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "figlet": "^1.6.0",
+    "mongodb": "^5.6.0",
+    "ts-node": "^10.9.1"
+  }
+}
