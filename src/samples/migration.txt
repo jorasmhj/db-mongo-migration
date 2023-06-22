@@ -1,5 +1,4 @@
-import { IMigration } from '../interface'
-import DB from '../lib/helpers/db-helper'
+import { IMigration, DB } from 'saroj-test-lib'
 
 class Migration implements IMigration {
   /**
