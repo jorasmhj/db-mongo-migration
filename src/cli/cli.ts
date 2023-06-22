@@ -1,4 +1,4 @@
-#! /usr/bin/env node
+#!/usr/bin/env -S node -r "ts-node/register"
 import figlet from 'figlet'
 
 import { Command } from 'commander'

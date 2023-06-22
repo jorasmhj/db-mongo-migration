@@ -4,6 +4,7 @@
     "outDir": "dist",
     "strict": true,
     "target": "ES6",
+    "allowJs": true,
     "lib": ["es6"],
     "module": "commonjs",
     "sourceMap": true,
@@ -12,5 +13,5 @@
     "resolveJsonModule": true,
     "declaration": true
   },
-  "include": ["src/**/*.json", "src/**/*.ts", "src/**/*.js", "src/**/*.txt"]
+  "include": ["src"]
 }
