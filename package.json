@@ -1,7 +1,7 @@
 {
   "name": "saroj-test-lib",
   "version": "1.0.0",
-  "main": "./src/cli/index.js",
+  "main": "./dist/cli/cli.js",
   "license": "MIT",
   "author": {
     "email": "jorasmhj@gmail.com",
@@ -13,7 +13,7 @@
     "url": ""
   },
   "bin": {
-    "mongo-migrate": "./src/cli/index.js"
+    "m-m": "./dist/cli/cli.js"
   },
   "scripts": {
     "build": "rimraf dist/ && tsc -p . && copyfiles -u 1 src/**/*.txt dist/",

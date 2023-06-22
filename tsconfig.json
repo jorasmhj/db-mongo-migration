@@ -11,5 +11,5 @@
     "moduleResolution": "node",
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.json", "src/**/*.ts", "src/**/*.txt"]
+  "include": ["src/**/*.json", "src/**/*.ts", "src/**/*.js", "src/**/*.txt"]
 }
