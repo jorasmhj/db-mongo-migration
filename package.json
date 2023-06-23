@@ -1,5 +1,5 @@
 {
-  "name": "mongoration",
+  "name": "migrations-mongodb",
   "description": "Migration tool for MongoDB",
   "version": "1.0.0",
   "keywords": [
@@ -44,6 +44,7 @@
     "@babel/preset-typescript": "^7.22.5",
     "@types/figlet": "^1.5.6",
     "@types/node": "^20.3.1",
+    "chalk": "4",
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
     "mongodb": "^5.6.0",
