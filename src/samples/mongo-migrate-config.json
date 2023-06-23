@@ -8,7 +8,6 @@
       "useUnifiedTopology": true
     }
   },
-  "useFileHash": false,
   "migrationsDir": "migrations",
-  "changelogCollectionName": "changelog"
+  "changelogCollectionName": "migrations"
 }
