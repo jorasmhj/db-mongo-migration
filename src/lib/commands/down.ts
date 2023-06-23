@@ -1,4 +1,5 @@
 import path from 'path'
+import { rm } from 'fs/promises'
 import * as tsImport from 'ts-import'
 import { Db, MongoClient, ObjectId } from 'mongodb'
 
@@ -6,6 +7,7 @@ import DB from '../helpers/db-helper'
 import { IMigration } from '../../interface'
 import configHelper from '../helpers/config-helper'
 import { getLatestMigrationBatch, getLatestMigrations } from '../utils/migration-dir'
+import chalk from 'chalk'
 
 export default async function down(db: Db, dbClient: MongoClient, options: any) {
   const config = await configHelper.readConfig()
@@ -29,9 +31,9 @@ export default async function down(db: Db, dbClient: MongoClient, options: any) 
       )
       const migration: IMigration = new Migration()
 
-      console.log(`Rolling back: ${appliedMigration.fileName}`)
+      console.log(`${chalk.yellow(`Rolling back: `)} ${appliedMigration.fileName}`)
       await migration.down(model)
-      console.log(`Rolled back: ${appliedMigration.fileName}`)
+      console.log(`${chalk.green(`Rolled back:  `)} ${appliedMigration.fileName}`)
     }
 
     await db.collection(config.changelogCollectionName).deleteMany(
@@ -43,15 +45,19 @@ export default async function down(db: Db, dbClient: MongoClient, options: any) 
 
     if (options.dryRun) {
       await session.abortTransaction()
-      console.log('Dry run completed sucessfully')
+      console.log(chalk.green('Dry run completed sucessfully'))
     } else {
       await session.commitTransaction()
-      console.log('Migration completed sucessfully')
+      console.log(chalk.green('Migration completed sucessfully'))
     }
     session.endSession()
+
+    await rm(path.resolve(`.cache`), { recursive: true })
   } catch (error: any) {
-    console.log(error.toString())
+    await rm(path.resolve(`.cache`), { recursive: true })
     await session.abortTransaction()
     dbClient.close()
+
+    throw error
   }
 }

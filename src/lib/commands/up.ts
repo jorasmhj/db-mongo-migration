@@ -1,4 +1,6 @@
 import path from 'path'
+import chalk from 'chalk'
+import { rm } from 'fs/promises'
 import { randomUUID } from 'crypto'
 import * as tsImport from 'ts-import'
 import { Db, MongoClient } from 'mongodb'
@@ -28,12 +30,11 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
       const { default: Migration } = await tsImport.load(
         path.resolve(`${config.migrationsDir}/${unAppliedMigration.fileName}`)
       )
-      console.log(Migration)
       const migration: IMigration = new Migration()
 
-      console.log(`Migrating: ${unAppliedMigration.fileName}`)
+      console.log(`${chalk.yellow(`Migrating: `)} ${unAppliedMigration.fileName}`)
       await migration.up(model)
-      console.log(`Migrated: ${unAppliedMigration.fileName}`)
+      console.log(`${chalk.green(`Migrated:  `)} ${unAppliedMigration.fileName}`)
 
       migrationsToApply.push({
         fileName: unAppliedMigration.fileName,
@@ -46,15 +47,19 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
 
     if (options.dryRun) {
       await session.abortTransaction()
-      console.log('Dry run completed sucessfully')
+      console.log(chalk.green('Dry run completed sucessfully'))
     } else {
       await session.commitTransaction()
-      console.log('Migration completed sucessfully')
+      console.log(chalk.green('Migration completed sucessfully'))
     }
     session.endSession()
+
+    await rm(path.resolve(`.cache`), { recursive: true })
   } catch (error: any) {
-    console.log(error.toString())
     await session.abortTransaction()
+    await rm(path.resolve(`.cache`), { recursive: true })
     dbClient.close()
+
+    throw error
   }
 }
