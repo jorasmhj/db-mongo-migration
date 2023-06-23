@@ -1,4 +1,4 @@
-import { IMigration, DB } from 'saroj-test-lib'
+import { IMigration, DB } from 'mongoration'
 
 class Migration implements IMigration {
   /**

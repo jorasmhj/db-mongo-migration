@@ -1,5 +1,6 @@
 import path from 'path'
 import { randomUUID } from 'crypto'
+import * as tsImport from 'ts-import'
 import { Db, MongoClient } from 'mongodb'
 
 import status from './status'
@@ -24,9 +25,10 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
     const model = new DB(db, session)
 
     for (const unAppliedMigration of unAppliedMigrations) {
-      const { default: Migration } = await import(
+      const { default: Migration } = await tsImport.load(
         path.resolve(`${config.migrationsDir}/${unAppliedMigration.fileName}`)
       )
+      console.log(Migration)
       const migration: IMigration = new Migration()
 
       console.log(`Migrating: ${unAppliedMigration.fileName}`)
