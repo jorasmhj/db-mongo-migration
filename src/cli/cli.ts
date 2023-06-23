@@ -1,4 +1,5 @@
 #!/usr/bin/env -S node -r "ts-node/register"
+import chalk from 'chalk'
 import figlet from 'figlet'
 
 import { Command } from 'commander'
@@ -23,11 +24,10 @@ program
   .command('status')
   .description('Get migration status')
   .action(async options => {
-    const {
-      'db-connection': { url, databaseName }
-    } = await configHelper.readConfig()
-
     try {
+      const {
+        'db-connection': { url, databaseName }
+      } = await configHelper.readConfig()
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
       await mongoClient.connect()
@@ -35,8 +35,9 @@ program
 
       console.table(migrationStatus)
       process.exit(0)
-    } catch (error) {
-      console.error(error)
+    } catch (error: any) {
+      console.error(chalk.red(error.toString()))
+      process.exit(1)
     }
   })
 
@@ -45,19 +46,18 @@ program
   .option('-d --dry-run', 'Run migration with a dry run')
   .description('Run migration')
   .action(async options => {
-    const {
-      'db-connection': { url, databaseName }
-    } = await configHelper.readConfig()
-
     try {
+      const {
+        'db-connection': { url, databaseName }
+      } = await configHelper.readConfig()
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
       await mongoClient.connect()
       await up(dbInstance, mongoClient, options)
       process.exit(0)
-    } catch (error) {
-      console.error(error)
-      process.exit(0)
+    } catch (error: any) {
+      console.error(chalk.red(error.toString()))
+      process.exit(1)
     }
   })
 
@@ -68,26 +68,31 @@ program
   .option('-b --batch <number>', 'Number of batch to rollback')
   .option('-s --steps <number>', 'Number of steps to rollback')
   .action(async options => {
-    const opts: any = {}
-    const {
-      'db-connection': { url, databaseName }
-    } = await configHelper.readConfig()
+    try {
+      const opts: any = {}
+      const {
+        'db-connection': { url, databaseName }
+      } = await configHelper.readConfig()
 
-    const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
-    const dbInstance = mongoClient.db(databaseName)
-    await mongoClient.connect()
+      const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
+      const dbInstance = mongoClient.db(databaseName)
+      await mongoClient.connect()
 
-    if (options.dryRun) opts.dryRun = options.dryRun
+      if (options.dryRun) opts.dryRun = options.dryRun
 
-    if (options.batch || options.steps) {
-      if (options.batch) opts.batch = +options.batch
-      else opts.steps = +options.steps
-    } else {
-      opts.batch = 1
+      if (options.batch || options.steps) {
+        if (options.batch) opts.batch = +options.batch
+        else opts.steps = +options.steps
+      } else {
+        opts.batch = 1
+      }
+
+      await down(dbInstance, mongoClient, opts)
+      process.exit(0)
+    } catch (error: any) {
+      console.error(chalk.red(error.toString()))
+      process.exit(1)
     }
-
-    await down(dbInstance, mongoClient, opts)
-    process.exit(0)
   })
 
 program.parse(process.argv)
