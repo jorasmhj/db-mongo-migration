@@ -1,6 +1,10 @@
 {
-  "name": "saroj-test-lib",
+  "name": "mongoration",
+  "description": "Migration tool for MongoDB",
   "version": "1.0.0",
+  "keywords": [
+    "migrate migration mongo mongodb migrations database mongo-migrate mongo-migration migrate-mongo"
+  ],
   "main": "./dist/cli/cli.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
