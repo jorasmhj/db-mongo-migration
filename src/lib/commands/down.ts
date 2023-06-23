@@ -1,4 +1,5 @@
 import path from 'path'
+import * as tsImport from 'ts-import'
 import { Db, MongoClient, ObjectId } from 'mongodb'
 
 import DB from '../helpers/db-helper'
@@ -23,7 +24,9 @@ export default async function down(db: Db, dbClient: MongoClient, options: any) 
     const model = new DB(db, session)
 
     for (const appliedMigration of migrationsToRollback) {
-      const { default: Migration } = await import(path.resolve(`${config.migrationsDir}/${appliedMigration.fileName}`))
+      const { default: Migration } = await tsImport.load(
+        path.resolve(`${config.migrationsDir}/${appliedMigration.fileName}`)
+      )
       const migration: IMigration = new Migration()
 
       console.log(`Rolling back: ${appliedMigration.fileName}`)
