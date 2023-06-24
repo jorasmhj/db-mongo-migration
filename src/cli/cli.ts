@@ -1,4 +1,4 @@
-#!/usr/bin/env -S node -r "ts-node/register"
+#!/usr/bin/env node
 import chalk from 'chalk'
 import figlet from 'figlet'
 
