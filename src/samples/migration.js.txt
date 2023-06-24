@@ -1,0 +1,13 @@
+class Migration implements IMigration {
+  /**
+   * Run the migrations.
+   */
+  async up(db) {}
+
+  /**
+   * Reverse the migrations.
+   */
+  async down(db) {}
+}
+
+export default Migration
