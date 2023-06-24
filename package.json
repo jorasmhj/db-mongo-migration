@@ -1,5 +1,5 @@
 {
-  "name": "mongo-db-migration",
+  "name": "db-mongo-migration",
   "description": "Migration tool for MongoDB",
   "version": "1.0.0",
   "keywords": [
