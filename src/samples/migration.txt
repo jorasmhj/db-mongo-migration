@@ -1,4 +1,4 @@
-import { IMigration, DB } from 'migrations-mongodb'
+import { IMigration, DB } from 'db-mongo-migration'
 
 class Migration implements IMigration {
   /**

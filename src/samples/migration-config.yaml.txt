@@ -1,0 +1,9 @@
+db-connection:
+  url: asd
+  databaseName: asd
+  options:
+    useNewUrlParser: true
+    useUnifiedTopology: true
+
+migrationsDir: migrations
+changelogCollectionName: migrations
