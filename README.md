@@ -1,13 +1,21 @@
 # Db-Mongo-Migration
 
+<p align="center">
+
+[![Coverage Status](https://coveralls.io/repos/github/jorasmhj/db-mongo-migration/badge.svg?branch=master)](https://coveralls.io/r/jorasmhj/db-mongo-migration) [![NPM](https://img.shields.io/npm/v/db-mongo-migration.svg?style=flat)](https://www.npmjs.org/package/db-mongo-migration) [![Downloads](https://img.shields.io/npm/dm/db-mongo-migration.svg?style=flat)](https://www.npmjs.org/package/db-mongo-migration) [![Known Vulnerabilities](https://snyk.io/test/github/jorasmhj/db-mongo-migration/badge.svg)](https://snyk.io/test/github/jorasmhj/db-mongo-migration)
+
+[![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/jorasmhj)
+
 A command-line tool for running and managing MongoDB migrations.
+
+</p>
 
 ## Installation
 
 To install Db-Mongo-Migration, run the following command:
 
 ```
-npm install db-mongo-migration
+npm i db-mongo-migration
 ```
 
 ## CLI Usage
