@@ -100,6 +100,7 @@ This will run all pending migrations.
 
 #### Options
 
+- `-f, -file <filename>`: Run migration for a specific file.
 - `-d, --dry-run`: Run migration with a dry run.
 
 ### Rollback Migrations
