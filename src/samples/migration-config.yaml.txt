@@ -1,6 +1,6 @@
 db-connection:
-  url: asd
-  databaseName: asd
+  url: ${URL}
+  databaseName: ${DB_NAME}
   options:
     useNewUrlParser: true
     useUnifiedTopology: true
