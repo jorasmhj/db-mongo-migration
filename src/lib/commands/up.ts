@@ -15,7 +15,9 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
   if (!config) return console.error('Migration not initialized yet.')
 
   const allMigrations = await status(db)
-  const unAppliedMigrations = allMigrations.filter(m => m.appliedAt === 'PENDING')
+  const unAppliedMigrations = allMigrations.filter(m => {
+    return options.file ? m.appliedAt === 'PENDING' && m.fileName === options.file : m.appliedAt === 'PENDING'
+  })
 
   const session = dbClient.startSession()
   session.startTransaction()

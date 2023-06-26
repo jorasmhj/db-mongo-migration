@@ -43,6 +43,7 @@ program
 
 program
   .command('up')
+  .option('-f --file <filename>', 'Run migration for a specific file')
   .option('-d --dry-run', 'Run migration with a dry run')
   .description('Run migration')
   .action(async options => {
