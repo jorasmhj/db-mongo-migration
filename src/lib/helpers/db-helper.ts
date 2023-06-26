@@ -1,4 +1,5 @@
 import {
+  AnyBulkWriteOperation,
   ClientSession,
   Db,
   Document,
@@ -12,6 +13,10 @@ import {
 
 class DB {
   constructor(public db: Db, private session?: ClientSession) {}
+
+  bulkWrite(collection: string, operations: AnyBulkWriteOperation<Document>[]) {
+    return this.db.collection(collection).bulkWrite(operations, { session: this.session })
+  }
 
   deleteMany(collection: string, filter?: Filter<Document>) {
     return this.db.collection(collection).deleteMany(filter, { session: this.session })
