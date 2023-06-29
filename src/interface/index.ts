@@ -27,3 +27,9 @@ export interface IMigrationInfo {
   appliedAt?: Date | string
   batchId?: string
 }
+
+export interface IMigrationStatus {
+  fileName: string
+  appliedAt: string
+  batchId: string
+}

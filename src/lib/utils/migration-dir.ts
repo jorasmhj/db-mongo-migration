@@ -37,7 +37,9 @@ export async function getAppliedMigrations(db: Db): Promise<IMigrationInfo[]> {
   const config = await configHelper.readConfig()
   if (!config) throw console.error('Migration not initialized yet.')
 
-  return db.collection(config.changelogCollectionName).find({}).toArray() as unknown as Promise<IMigrationInfo[]>
+  return db.collection(config.changelogCollectionName).find({}).sort({ _id: -1 }).toArray() as unknown as Promise<
+    IMigrationInfo[]
+  >
 }
 
 export async function getLatestMigrationBatch(db: Db, limit: number = 1) {

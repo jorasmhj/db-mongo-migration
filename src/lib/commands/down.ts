@@ -1,13 +1,13 @@
 import path from 'path'
-import { rm } from 'fs/promises'
+import chalk from 'chalk'
 import * as tsImport from 'ts-import'
 import { Db, MongoClient, ObjectId } from 'mongodb'
 
 import DB from '../helpers/db-helper'
 import { IMigration } from '../../interface'
+import { removeDirectory } from '../utils/file'
 import configHelper from '../helpers/config-helper'
 import { getLatestMigrationBatch, getLatestMigrations } from '../utils/migration-dir'
-import chalk from 'chalk'
 
 export default async function down(db: Db, dbClient: MongoClient, options: any) {
   const config = await configHelper.readConfig()
@@ -52,9 +52,9 @@ export default async function down(db: Db, dbClient: MongoClient, options: any) 
     }
     session.endSession()
 
-    await rm(path.resolve(`.cache`), { recursive: true })
+    await removeDirectory('.cache', { recursive: true })
   } catch (error: any) {
-    await rm(path.resolve(`.cache`), { recursive: true })
+    await removeDirectory('.cache', { recursive: true })
     await session.abortTransaction()
     dbClient.close()
 
