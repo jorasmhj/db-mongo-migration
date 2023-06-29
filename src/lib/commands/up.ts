@@ -1,27 +1,31 @@
 import path from 'path'
 import chalk from 'chalk'
-import { rm } from 'fs/promises'
-import { randomUUID } from 'crypto'
 import * as tsImport from 'ts-import'
 import { Db, MongoClient } from 'mongodb'
 
 import status from './status'
 import DB from '../helpers/db-helper'
+import { removeDirectory } from '../utils/file'
 import configHelper from '../helpers/config-helper'
 import { IMigration, IMigrationInfo } from '../../interface'
+import { randomUUID } from 'crypto'
 
 export default async function up(db: Db, dbClient: MongoClient, options: any) {
-  const config = await configHelper.readConfig()
-  if (!config) return console.error('Migration not initialized yet.')
-
-  const allMigrations = await status(db)
-  const unAppliedMigrations = allMigrations.filter(m => m.appliedAt === 'PENDING')
-
   const session = dbClient.startSession()
   session.startTransaction()
 
   try {
+    const config = await configHelper.readConfig()
+
+    const allMigrations = await status(db)
+    const unAppliedMigrations = allMigrations.filter(m => {
+      return options.file ? m.appliedAt === 'PENDING' && m.fileName === options.file : m.appliedAt === 'PENDING'
+    })
+
+    // const latestBatchId = allMigrations.filter(m => m.appliedAt !== 'PENDING')[0]
+    // const batchId = (!latestBatchId?.batchId ? 1 : +latestBatchId.batchId + 1).toString()
     const batchId = randomUUID()
+
     const migrationsToApply: IMigrationInfo[] = []
 
     const model = new DB(db, session)
@@ -54,10 +58,10 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
     }
     session.endSession()
 
-    await rm(path.resolve(`.cache`), { recursive: true })
+    await removeDirectory('.cache', { recursive: true })
   } catch (error: any) {
     await session.abortTransaction()
-    await rm(path.resolve(`.cache`), { recursive: true })
+    await removeDirectory('.cache', { recursive: true })
     dbClient.close()
 
     throw error
