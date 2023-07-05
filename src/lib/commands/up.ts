@@ -8,7 +8,6 @@ import DB from '../helpers/db-helper'
 import { removeDirectory } from '../utils/file'
 import configHelper from '../helpers/config-helper'
 import { IMigration, IMigrationInfo } from '../../interface'
-import { randomUUID } from 'crypto'
 
 export default async function up(db: Db, dbClient: MongoClient, options: any) {
   const session = dbClient.startSession()
@@ -22,9 +21,8 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
       return options.file ? m.appliedAt === 'PENDING' && m.fileName === options.file : m.appliedAt === 'PENDING'
     })
 
-    // const latestBatchId = allMigrations.filter(m => m.appliedAt !== 'PENDING')[0]
-    // const batchId = (!latestBatchId?.batchId ? 1 : +latestBatchId.batchId + 1).toString()
-    const batchId = randomUUID()
+    const latestBatchId = allMigrations.filter(m => m.appliedAt !== 'PENDING')[0]
+    const batchId = !latestBatchId?.batchId ? 1 : +latestBatchId.batchId + 1
 
     const migrationsToApply: IMigrationInfo[] = []
 
