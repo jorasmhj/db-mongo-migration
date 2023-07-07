@@ -79,3 +79,11 @@ export async function getLatestMigrations(db: Db, limit: number = 1) {
     .limit(limit)
     .toArray() as unknown as Promise<IMigrationInfo[]>
 }
+
+export async function getMigrationForFile(fileName: string, db: Db) {
+  const config = await configHelper.readConfig()
+
+  return db.collection(config.changelogCollectionName).find({ fileName }).toArray() as unknown as Promise<
+    IMigrationInfo[]
+  >
+}
