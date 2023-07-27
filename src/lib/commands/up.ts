@@ -45,7 +45,9 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
       })
     }
 
-    await db.collection(config.changelogCollectionName).insertMany(migrationsToApply as any, { session })
+    if (!!migrationsToApply.length) {
+      await db.collection(config.changelogCollectionName).insertMany(migrationsToApply as any, { session })
+    }
 
     if (options.dryRun) {
       await session.abortTransaction()
