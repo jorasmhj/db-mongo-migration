@@ -4659,10 +4659,10 @@ yallist@^4.0.0:
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
   integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
-yaml-env-defaults@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/yaml-env-defaults/-/yaml-env-defaults-2.0.2.tgz#d44a364604936b487092faa9754522a3e34651c6"
-  integrity sha512-Ehl51pQZaRnUSsaqUGRHYUvEH+Kg4V9WNrcXtSbKPdav70NHdiXe/PALXXclycaLXx2N0wEG9qI2dhVu95F9SA==
+yaml-env-defaults@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/yaml-env-defaults/-/yaml-env-defaults-2.0.5.tgz#e8c8753a4219265a9ee42813558b24d9b4b1d329"
+  integrity sha512-VORwkpRjNidt+YOfziMZpfAJ0C0nHNI0qLNH6jB4xXj3+h90/AusqFFw23CIcevHGwnBGdZgLnMLBhGIBz1ocA==
   dependencies:
     js-yaml "^4.1.0"
     lodash "^4.17.21"
