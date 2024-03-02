@@ -25,6 +25,7 @@
     "mongo-migrate": "./dist/cli/cli.js"
   },
   "scripts": {
+    "dev": "ts-node src/cli/cli.ts",
     "build": "rimraf dist/ && tsc -p . && copyfiles -u 1 src/**/*.txt dist/",
     "prepare": "husky install"
   },
