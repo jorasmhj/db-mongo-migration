@@ -1,0 +1,9 @@
+db-connection:
+  url: ${URL}
+  databaseName: ${DB_NAME}
+  options:
+    useNewUrlParser: true
+    useUnifiedTopology: true
+
+migrationsDir: src/migrations
+changelogCollectionName: migrations
