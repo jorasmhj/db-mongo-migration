@@ -65,7 +65,9 @@ program
 program
   .command('down')
   .description('Rollback migrations')
+  .option('-f --file <filename>', 'Run migration rollback for a specific file')
   .option('-d --dry-run', 'Run migration rollback with a dry run')
+  .option('-r --reset', 'Reset migration')
   .option('-b --batch <number>', 'Number of batch to rollback')
   .option('-s --steps <number>', 'Number of steps to rollback')
   .action(async options => {
@@ -79,10 +81,12 @@ program
       const dbInstance = mongoClient.db(databaseName)
       await mongoClient.connect()
 
+      if (options.file) opts.file = options.file
       if (options.dryRun) opts.dryRun = options.dryRun
 
-      if (options.batch || options.steps) {
-        if (options.batch) opts.batch = +options.batch
+      if (options.batch || options.steps || options.reset) {
+        if (options.reset) opts.reset = options.reset
+        else if (options.batch) opts.batch = +options.batch
         else opts.steps = +options.steps
       } else {
         opts.batch = 1

@@ -115,6 +115,8 @@ This will rollback the last batch of migrations.
 
 #### Options
 
+- `-f, -file <filename>`: Run rollback for a specific file.
+- `-r, -reset`: Reset the migration.
 - `-d, --dry-run`: Run migration rollback with a dry run.
 - `-b, --batch <number>`: Number of batch to rollback.
 - `-s, --steps <number>`: Number of steps to rollback.
