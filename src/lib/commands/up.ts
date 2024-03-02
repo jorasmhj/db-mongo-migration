@@ -30,8 +30,8 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
 
     for (const unAppliedMigration of unAppliedMigrations) {
       const filePath = `${config.migrationsDir}/${unAppliedMigration.fileName}`
+      
       // const { default: Migration } = await import(path.resolve(filePath))
-
       const { default: Migration } = await tsImport.load(path.resolve(filePath))
       const migration: IMigration = new Migration()
 
