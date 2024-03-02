@@ -1,4 +1,4 @@
-class Migration implements IMigration {
+class Migration {
   /**
    * Run the migrations.
    */

@@ -3,3 +3,6 @@ node_modules
 .env
 
 dist
+
+migration-config.yaml
+migrations
