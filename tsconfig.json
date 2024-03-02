@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "dist",
-    "strict": true,
-    "target": "ES2020",
-    "allowJs": true,
+    "module": "commonjs",
+    "target": "esnext",
     "lib": ["es6"],
-    "module": "Node16",
     "sourceMap": true,
     "esModuleInterop": true,
-    "moduleResolution": "Node16",
-    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
     "declaration": true
   },
   "include": ["src", "src/**/*.json"],
