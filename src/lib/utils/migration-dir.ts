@@ -6,6 +6,9 @@ import isFileExist from './file'
 import { IMigrationInfo } from '../../interface'
 import configHelper from '../helpers/config-helper'
 
+export const MIGRATION_NATIVE_FILE_PREFIX = '_nat'
+export const nativeDetectionRegexPattern: RegExp = new RegExp(`^\\d{13}${MIGRATION_NATIVE_FILE_PREFIX}-(.+)`)
+
 export async function migrationDirExist() {
   const config = configHelper.readConfig()
   if (!config) return console.error('Migration not initialized yet.')

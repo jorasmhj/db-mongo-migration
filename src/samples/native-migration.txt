@@ -1,0 +1,22 @@
+import { INativeMigration, DbSessionHelper, IOption } from "db-mongo-migration"
+import {  Db, MongoClient } from 'mongodb';
+
+class NativeMigration implements INativeMigration {
+  /**
+   * Run the migrations.
+   */
+  async up(db: Db, client: MongoClient, option?: IOption) {
+    new DbSessionHelper(client).createAndCommitTransaction(async session => {
+      // YOUR CODE HERE
+    }, option);
+  }
+
+  /**
+   * Reverse the migrations.
+   */
+  async down(db: Db, client: MongoClient, option?: IOption) {
+    // YOUR CODE HERE
+  }
+}
+
+export default NativeMigration;
