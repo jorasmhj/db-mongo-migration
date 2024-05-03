@@ -14,7 +14,7 @@ export default async function down(db: Db, dbClient: MongoClient, options: any) 
   session.startTransaction()
 
   try {
-    const config = await configHelper.readConfig()
+    const config = configHelper.readConfig()
     const migrationsToRollback = await getMigrationsToRollback(db, options)
 
     await rollbackMigrations(migrationsToRollback, db, config, session)
@@ -43,23 +43,20 @@ async function rollbackMigrations(migrationsToRollback: IMigrationInfo[], db: Db
 
   for (const appliedMigration of migrationsToRollback) {
     console.log(`${chalk.yellow(`Rolling back: `)} ${appliedMigration.fileName}`)
-    if (!isFileExist(path.resolve(`${config.migrationsDir}/${appliedMigration.fileName}`))) {
+    const filePath = path.resolve(`${config.migrationsDir}/${appliedMigration.fileName}`)
+    if (!isFileExist(filePath)) {
       console.log(chalk.yellow(`${appliedMigration.fileName} not found, skipping..`))
       continue
     }
 
-    const { default: Migration } = await tsImport.load(
-      path.resolve(`${config.migrationsDir}/${appliedMigration.fileName}`)
-    )
+    const { default: Migration } = await tsImport.load(filePath)
     const migration: IMigration = new Migration()
 
     await migration.down(model)
     console.log(`${chalk.green(`Rolled back:  `)} ${appliedMigration.fileName}`)
   }
 
-  await db
-    .collection(config.changelogCollectionName)
-    .deleteMany({ _id: { $in: uniquemigrationIds as unknown as ObjectId[] } }, { session })
+  await db.collection(config.changelogCollectionName).deleteMany({ _id: { $in: uniquemigrationIds as unknown as ObjectId[] } }, { session })
 
   return uniquemigrationIds
 }
@@ -68,10 +65,10 @@ async function getMigrationsToRollback(db: Db, options: any) {
   const migrationsToRollback = options.file
     ? await getMigrationForFile(options.file, db)
     : options.reset
-    ? await getLatestMigrations(db, 0)
-    : options.batch
-    ? await getLatestMigrationBatch(db, options.batch)
-    : await getLatestMigrations(db, options.steps)
+      ? await getLatestMigrations(db, 0)
+      : options.batch
+        ? await getLatestMigrationBatch(db, options.batch)
+        : await getLatestMigrations(db, options.steps)
 
   return migrationsToRollback
 }

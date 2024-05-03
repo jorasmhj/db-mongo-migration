@@ -5,7 +5,7 @@
   "arrowParens": "avoid",
   "multiLine": "avoid",
   "bracketSameLine": true,
-  "trailingComma": "es5",
+  "trailingComma": "none",
   "endOfLine": "auto",
   "tabWidth": 2
 }

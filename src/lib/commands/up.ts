@@ -14,7 +14,7 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
   session.startTransaction()
 
   try {
-    const config = await configHelper.readConfig()
+    const config = configHelper.readConfig()
 
     const allMigrations = await status(db)
     const unAppliedMigrations = allMigrations.filter(m => {
