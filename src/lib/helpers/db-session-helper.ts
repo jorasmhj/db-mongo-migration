@@ -1,0 +1,67 @@
+import chalk from 'chalk'
+import { ClientSession, ClientSessionOptions, MongoClient } from 'mongodb'
+import { IOption } from '../../interface'
+
+async function commitWithRetry(session: ClientSession, option?: IOption) {
+  try {
+    if (option?.dryRun) {
+      await session.abortTransaction()
+      console.log(chalk.green('Dry run completed successfully'))
+    } else {
+      await session.commitTransaction()
+      console.log(chalk.green('Migration completed successfully'))
+    }
+  } catch (error: any) {
+    if (error.errorLabels && error.errorLabels.indexOf('UnknownTransactionCommitResult') >= 0) {
+      console.log(`${chalk.yellow(`Retrying commit operation due to UnknownTransactionCommitResult...`)}`)
+      await commitWithRetry(session, option)
+    } else {
+      throw error
+    }
+  }
+}
+
+/**
+ * The function `handleTransaction` creates a MongoDB session, starts a transaction, executes
+ * a callback function with the session, commits the transaction if successful, and ends the session.
+ * @param callback - The `callback` parameter is a function that takes a `ClientSession` as an argument
+ * and returns a value. This function is responsible for performing the desired operations within the
+ * transaction.
+ * @param clientSessionOption - Optional settings for the client session.
+ * @returns The result of the callback function is being returned.
+ * @throws An error if the transaction is aborted or fails.
+ */
+async function handleDbTransaction(
+  dbClient: MongoClient,
+  callback: (arg0: ClientSession) => any,
+  option?: IOption,
+  clientSessionOption?: ClientSessionOptions
+) {
+  if (dbClient) {
+    const session = dbClient.startSession(clientSessionOption)
+    session.startTransaction()
+    try {
+      const result = await callback(session)
+
+      await commitWithRetry(session, option)
+      await session.endSession()
+
+      return result
+    } catch (error: any) {
+      console.log(`${chalk.red(`Transaction aborted! Caught exception during transaction.`)}`)
+
+      // If transient error, retry the whole transaction
+      if (error.errorLabels && error.errorLabels.indexOf('TransientTransactionError') >= 0) {
+        console.log(`${chalk.yellow(`Retrying transaction due to TransientTransactionError...`)}`)
+
+        return await handleDbTransaction(dbClient, callback, option, clientSessionOption)
+      } else {
+        await session.abortTransaction()
+        await session.endSession()
+        throw error
+      }
+    }
+  }
+}
+
+export { handleDbTransaction }

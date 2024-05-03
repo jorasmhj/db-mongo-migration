@@ -1,14 +1,18 @@
-import { INativeMigration, DbSessionHelper, IOption } from "db-mongo-migration"
-import {  Db, MongoClient } from 'mongodb';
+import { INativeMigration, handleDbTransaction, IOption } from 'db-mongo-migration'
+import { Db, MongoClient } from 'mongodb'
 
 class NativeMigration implements INativeMigration {
   /**
    * Run the migrations.
    */
   async up(db: Db, client: MongoClient, option?: IOption) {
-    new DbSessionHelper(client).createAndCommitTransaction(async session => {
-      // YOUR CODE HERE
-    }, option);
+    handleDbTransaction(
+      client,
+      async session => {
+        // YOUR CODE HERE
+      },
+      option
+    )
   }
 
   /**
@@ -19,4 +23,4 @@ class NativeMigration implements INativeMigration {
   }
 }
 
-export default NativeMigration;
+export default NativeMigration
