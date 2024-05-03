@@ -13,12 +13,14 @@ import configHelper from '../lib/helpers/config-helper'
 
 const program = new Command()
 
-console.log(figlet.textSync('Mongo-Migrate'))
+const { projectName } = configHelper.readConfig()
+const figletPrefix = projectName ? `${projectName}-` : ''
+console.log(figlet.textSync(`${figletPrefix}Mongo-Migrate`));
 
 program.version('1.0.0')
 program.command('init').description('Initialize migration config').action(init)
 
-program.command('create [name]').description('Create a migration').action(create)
+program.command('create [name]').option('-n --native', 'Create migration file for native Mongo DB operation').description('Create a migration').action(create)
 
 program
   .command('status')
@@ -27,7 +29,7 @@ program
     try {
       const {
         'db-connection': { url, databaseName }
-      } = await configHelper.readConfig()
+      } = configHelper.readConfig()
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
       await mongoClient.connect()
@@ -50,7 +52,7 @@ program
     try {
       const {
         'db-connection': { url, databaseName }
-      } = await configHelper.readConfig()
+      } = configHelper.readConfig()
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
       await mongoClient.connect()
@@ -75,7 +77,7 @@ program
       const opts: any = {}
       const {
         'db-connection': { url, databaseName }
-      } = await configHelper.readConfig()
+      } = configHelper.readConfig()
 
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
