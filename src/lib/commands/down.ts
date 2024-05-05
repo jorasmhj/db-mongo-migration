@@ -10,7 +10,8 @@ import isFileExist, { removeDirectory } from '../utils/file'
 import { getLatestMigrationBatch, getLatestMigrations, getMigrationForFile } from '../utils/migration-dir'
 
 export default async function down(db: Db, dbClient: MongoClient, options: any) {
-  const useDefaultTransaction = configHelper.readConfig().useDefaultTransaction ?? false
+  const config = configHelper.readConfig()
+  const useDefaultTransaction = config.useDefaultTransaction ?? false
   const hasGlobalTransaction = useDefaultTransaction || options.dryRun
 
   let session = undefined
@@ -19,8 +20,9 @@ export default async function down(db: Db, dbClient: MongoClient, options: any) 
     session.startTransaction()
   }
 
+  console.log(`Running ${session ? 'with' : 'without'} global session \n`)
+
   try {
-    const config = configHelper.readConfig()
     const migrationsToRollback = await getMigrationsToRollback(db, options)
 
     await rollbackMigrations(migrationsToRollback, db, config, session)
@@ -60,10 +62,9 @@ async function rollbackMigrations(migrationsToRollback: IMigrationInfo[], db: Db
     const migration: IMigration = new Migration()
 
     await migration.down(model)
+    await db.collection(config.changelogCollectionName).deleteOne({ _id: appliedMigration._id as any }, { session })
     console.log(`${chalk.green(`Rolled back:  `)} ${appliedMigration.fileName}`)
   }
-
-  await db.collection(config.changelogCollectionName).deleteMany({ _id: { $in: uniquemigrationIds as unknown as ObjectId[] } }, { session })
 
   return uniquemigrationIds
 }

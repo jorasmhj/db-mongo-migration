@@ -5,12 +5,13 @@ import { Db, MongoClient } from 'mongodb'
 
 import status from './status'
 import DB from '../helpers/db-helper'
+import { IMigration } from '../../interface'
 import { removeDirectory } from '../utils/file'
 import configHelper from '../helpers/config-helper'
-import { IMigration, IMigrationInfo } from '../../interface'
 
 export default async function up(db: Db, dbClient: MongoClient, options: any) {
-  const useDefaultTransaction = configHelper.readConfig().useDefaultTransaction ?? false
+  const config = configHelper.readConfig()
+  const useDefaultTransaction = config.useDefaultTransaction ?? false
   const hasGlobalTransaction = useDefaultTransaction || options.dryRun
 
   let session = undefined
@@ -18,10 +19,9 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
     session = dbClient.startSession()
     session.startTransaction()
   }
+  console.log(`Running ${session ? 'with' : 'without'} global session \n`)
 
   try {
-    const config = configHelper.readConfig()
-
     const allMigrations = await status(db)
     const unAppliedMigrations = allMigrations.filter(m => {
       return options.file ? m.appliedAt === 'PENDING' && m.fileName === options.file : m.appliedAt === 'PENDING'
@@ -29,8 +29,6 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
 
     const latestBatchId = allMigrations.filter(m => m.appliedAt !== 'PENDING')[0]
     const batchId = !latestBatchId?.batchId ? 1 : +latestBatchId.batchId + 1
-
-    const migrationsToApply: IMigrationInfo[] = []
 
     const model = new DB(db, session)
 
@@ -44,15 +42,14 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
       await migration.up(model)
       console.log(`${chalk.green(`Migrated:  `)} ${unAppliedMigration.fileName}`)
 
-      migrationsToApply.push({
-        fileName: unAppliedMigration.fileName,
-        appliedAt: new Date(),
-        batchId
-      })
-    }
-
-    if (!!migrationsToApply.length) {
-      await db.collection(config.changelogCollectionName).insertMany(migrationsToApply as any, { session })
+      await db.collection(config.changelogCollectionName).insertOne(
+        {
+          fileName: unAppliedMigration.fileName,
+          appliedAt: new Date(),
+          batchId
+        },
+        { session }
+      )
     }
 
     if (hasGlobalTransaction) {
@@ -71,8 +68,9 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
     if (hasGlobalTransaction) await session?.abortTransaction()
 
     await removeDirectory('.cache', { recursive: true })
-    dbClient.close()
 
     throw error
+  } finally {
+    dbClient.close()
   }
 }
