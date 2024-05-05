@@ -27,7 +27,7 @@ program
     try {
       const {
         'db-connection': { url, databaseName }
-      } = await configHelper.readConfig()
+      } = configHelper.readConfig()
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
       await mongoClient.connect()
@@ -50,7 +50,7 @@ program
     try {
       const {
         'db-connection': { url, databaseName }
-      } = await configHelper.readConfig()
+      } = configHelper.readConfig()
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
       await mongoClient.connect()
@@ -75,7 +75,7 @@ program
       const opts: any = {}
       const {
         'db-connection': { url, databaseName }
-      } = await configHelper.readConfig()
+      } = configHelper.readConfig()
 
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)

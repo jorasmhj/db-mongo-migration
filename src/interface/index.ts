@@ -12,6 +12,7 @@ export interface IConfiguration {
   migrationsDir: string
   changelogCollectionName: string
   fileExtension?: FileExtension
+  useDefaultTransaction?: boolean
 }
 
 export interface IDbConnection {
