@@ -8,12 +8,11 @@ import FileExtension from '../../enums/file-extension'
 
 export default async function create(name: string, options: any) {
   try {
-    const config = await configHelper.readConfig()
+    const config = configHelper.readConfig()
     if (!config) return console.error('Migration not initialized yet.')
 
     const migrationDirPath = config.migrationsDir
-    const sampleFile =
-      config.fileExtension === FileExtension.TS ? '../../samples/migration.txt' : '../../samples/migration.js.txt'
+    const sampleFile = config.fileExtension === FileExtension.TS ? '../../samples/migration.txt' : '../../samples/migration.js.txt'
 
     if (!isFileExist(migrationDirPath)) {
       mkdirSync(migrationDirPath)

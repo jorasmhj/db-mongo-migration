@@ -7,7 +7,7 @@ import { IMigrationInfo } from '../../interface'
 import configHelper from '../helpers/config-helper'
 
 export async function migrationDirExist() {
-  const config = await configHelper.readConfig()
+  const config = configHelper.readConfig()
   if (!config) return console.error('Migration not initialized yet.')
 
   const migrationDirPath = config.migrationsDir
@@ -16,7 +16,7 @@ export async function migrationDirExist() {
 }
 
 export async function createMigrationDir() {
-  const config = await configHelper.readConfig()
+  const config = configHelper.readConfig()
   if (!config) return console.error('Migration not initialized yet.')
 
   const migrationDirPath = config.migrationsDir
@@ -24,7 +24,7 @@ export async function createMigrationDir() {
 }
 
 export async function getMigrationFiles() {
-  const config = await configHelper.readConfig()
+  const config = configHelper.readConfig()
   if (!config) throw console.error('Migration not initialized yet.')
 
   const migrationDirPath = config.migrationsDir
@@ -34,16 +34,14 @@ export async function getMigrationFiles() {
 }
 
 export async function getAppliedMigrations(db: Db): Promise<IMigrationInfo[]> {
-  const config = await configHelper.readConfig()
+  const config = configHelper.readConfig()
   if (!config) throw console.error('Migration not initialized yet.')
 
-  return db.collection(config.changelogCollectionName).find({}).sort({ _id: -1 }).toArray() as unknown as Promise<
-    IMigrationInfo[]
-  >
+  return db.collection(config.changelogCollectionName).find({}).sort({ _id: -1 }).toArray() as unknown as Promise<IMigrationInfo[]>
 }
 
 export async function getLatestMigrationBatch(db: Db, limit: number = 1) {
-  const config = await configHelper.readConfig()
+  const config = configHelper.readConfig()
   if (!config) throw console.error('Migration not initialized yet.')
 
   const distinctBatches = (await db
@@ -69,21 +67,16 @@ export async function getLatestMigrationBatch(db: Db, limit: number = 1) {
 }
 
 export async function getLatestMigrations(db: Db, limit: number = 1) {
-  const config = await configHelper.readConfig()
+  const config = configHelper.readConfig()
   if (!config) throw console.error('Migration not initialized yet.')
 
-  return db
-    .collection(config.changelogCollectionName)
-    .find({})
-    .sort({ _id: -1 })
-    .limit(limit)
-    .toArray() as unknown as Promise<IMigrationInfo[]>
+  return db.collection(config.changelogCollectionName).find({}).sort({ _id: -1 }).limit(limit).toArray() as unknown as Promise<
+    IMigrationInfo[]
+  >
 }
 
 export async function getMigrationForFile(fileName: string, db: Db) {
-  const config = await configHelper.readConfig()
+  const config = configHelper.readConfig()
 
-  return db.collection(config.changelogCollectionName).find({ fileName }).toArray() as unknown as Promise<
-    IMigrationInfo[]
-  >
+  return db.collection(config.changelogCollectionName).find({ fileName }).toArray() as unknown as Promise<IMigrationInfo[]>
 }

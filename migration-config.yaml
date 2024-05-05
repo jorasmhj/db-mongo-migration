@@ -1,9 +1,10 @@
 db-connection:
-  url: ${URL}
-  databaseName: ${DB_NAME}
+  url: mongodb://localhost:27018/users?authMechanism=DEFAULT&directConnection=true
+  databaseName: testDb
   options:
     useNewUrlParser: true
     useUnifiedTopology: true
 
 migrationsDir: src/migrations
 changelogCollectionName: migrations
+useDefaultTransaction: false
