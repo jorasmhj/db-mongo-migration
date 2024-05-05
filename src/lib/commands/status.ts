@@ -5,7 +5,7 @@ import configHelper from '../helpers/config-helper'
 import { getAppliedMigrations, getMigrationFiles } from '../utils/migration-dir'
 
 export default async function status(db: Db, options?: any) {
-  const config = await configHelper.readConfig()
+  const config = configHelper.readConfig()
   let [migrationFiles, appliedMigrations] = await Promise.all([getMigrationFiles(), getAppliedMigrations(db)])
 
   const uniqueBatches = [...new Set(appliedMigrations.map(m => m.batchId))]

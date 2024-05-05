@@ -7,7 +7,7 @@ import { IConfiguration } from '../../interface'
 import FileExtension from '../../enums/file-extension'
 
 class ConfigHelper {
-  async readConfig() {
+  readConfig() {
     const configFilePath = path.join(process.cwd(), 'migration-config.yaml')
 
     if (!isFileExist(configFilePath)) {

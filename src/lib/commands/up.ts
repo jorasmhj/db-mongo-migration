@@ -10,11 +10,17 @@ import configHelper from '../helpers/config-helper'
 import { IMigration, IMigrationInfo } from '../../interface'
 
 export default async function up(db: Db, dbClient: MongoClient, options: any) {
-  const session = dbClient.startSession()
-  session.startTransaction()
+  const useDefaultTransaction = configHelper.readConfig().useDefaultTransaction ?? false
+  const hasGlobalTransaction = useDefaultTransaction || options.dryRun
+
+  let session = undefined
+  if (hasGlobalTransaction) {
+    session = dbClient.startSession()
+    session.startTransaction()
+  }
 
   try {
-    const config = await configHelper.readConfig()
+    const config = configHelper.readConfig()
 
     const allMigrations = await status(db)
     const unAppliedMigrations = allMigrations.filter(m => {
@@ -30,7 +36,7 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
 
     for (const unAppliedMigration of unAppliedMigrations) {
       const filePath = `${config.migrationsDir}/${unAppliedMigration.fileName}`
-      
+
       const { default: Migration } = await tsImport.load(path.resolve(filePath))
       const migration: IMigration = new Migration()
 
@@ -49,18 +55,21 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
       await db.collection(config.changelogCollectionName).insertMany(migrationsToApply as any, { session })
     }
 
-    if (options.dryRun) {
-      await session.abortTransaction()
-      console.log(chalk.green('Dry run completed sucessfully'))
-    } else {
-      await session.commitTransaction()
-      console.log(chalk.green('Migration completed sucessfully'))
+    if (hasGlobalTransaction) {
+      if (options.dryRun) {
+        await session?.abortTransaction()
+        console.log(chalk.green('Dry run completed sucessfully'))
+      } else {
+        await session?.commitTransaction()
+        console.log(chalk.green('Migration completed sucessfully'))
+      }
+      session?.endSession()
     }
-    session.endSession()
 
     await removeDirectory('.cache', { recursive: true })
   } catch (error: any) {
-    await session.abortTransaction()
+    if (hasGlobalTransaction) await session?.abortTransaction()
+
     await removeDirectory('.cache', { recursive: true })
     dbClient.close()
 
