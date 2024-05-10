@@ -1,6 +1,7 @@
 import chalk from 'chalk'
-import { ClientSession, ClientSessionOptions, MongoClient } from 'mongodb'
+import { ClientSession, ClientSessionOptions } from 'mongodb'
 import { IOption } from '../../interface'
+import { MongoClient } from '../utils/migration-dir'
 
 async function commitWithRetry(session: ClientSession, option?: IOption) {
   try {
@@ -31,19 +32,14 @@ async function commitWithRetry(session: ClientSession, option?: IOption) {
  * @returns The result of the callback function is being returned.
  * @throws An error if the transaction is aborted or fails.
  */
-async function handleDbTransaction(
-  dbClient: MongoClient,
-  callback: (arg0: ClientSession) => any,
-  option?: IOption,
-  clientSessionOption?: ClientSessionOptions
-) {
+async function handleDbTransaction(dbClient: MongoClient, callback: (arg0: ClientSession) => any, clientSessionOption?: ClientSessionOptions) {
   if (dbClient) {
     const session = dbClient.startSession(clientSessionOption)
     session.startTransaction()
     try {
       const result = await callback(session)
 
-      await commitWithRetry(session, option)
+      await commitWithRetry(session, dbClient.customOptions)
       await session.endSession()
 
       return result
@@ -54,7 +50,7 @@ async function handleDbTransaction(
       if (error.errorLabels && error.errorLabels.indexOf('TransientTransactionError') >= 0) {
         console.log(`${chalk.yellow(`Retrying transaction due to TransientTransactionError...`)}`)
 
-        return await handleDbTransaction(dbClient, callback, option, clientSessionOption)
+        return await handleDbTransaction(dbClient, callback, clientSessionOption)
       } else {
         await session.abortTransaction()
         await session.endSession()

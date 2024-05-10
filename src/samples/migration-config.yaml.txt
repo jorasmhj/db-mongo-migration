@@ -7,3 +7,4 @@ db-connection:
 
 migrationsDir: migrations
 changelogCollectionName: migrations
+useDefaultTransaction: true

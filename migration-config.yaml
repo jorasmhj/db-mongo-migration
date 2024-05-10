@@ -5,6 +5,7 @@ db-connection:
     useNewUrlParser: true
     useUnifiedTopology: true
 
-migrationsDir: src/migrations
+migrationsDir: migrations
 changelogCollectionName: migrations
 projectName: Joras
+useDefaultTransaction: true

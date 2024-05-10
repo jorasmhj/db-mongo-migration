@@ -1,19 +1,19 @@
-import { Db, MongoClient } from 'mongodb';
+import { Db, MongoClient } from 'mongodb'
 import FileExtension from '../enums/file-extension'
 import DB from '../lib/helpers/db-helper'
 
 export interface IOption {
-  dryRun: boolean;
+  dryRun: boolean
 }
 
 export interface IMigration {
-  up: (db: DB) => Promise<any>
-  down: (db: DB) => Promise<any>
+  up: (db: DB, dbClient?: MongoClient) => Promise<any>
+  down: (db: DB, dbClient?: MongoClient) => Promise<any>
 }
 
 export interface INativeMigration {
-  up: (db: Db, dbClient: MongoClient, options?: IOption) => Promise<any>;
-  down: (db: Db, dbClient: MongoClient, options?: IOption) => Promise<any>;
+  up: (db: Db, dbClient: MongoClient, options?: IOption) => Promise<any>
+  down: (db: Db, dbClient: MongoClient, options?: IOption) => Promise<any>
 }
 
 export interface IConfiguration {
@@ -23,6 +23,7 @@ export interface IConfiguration {
   changelogCollectionName: string
   fileExtension?: FileExtension
   projectName?: string
+  useDefaultTransaction?: boolean
 }
 
 export interface IDbConnection {
@@ -45,4 +46,8 @@ export interface IMigrationStatus {
   fileName: string
   appliedAt: string
   batchId: string
+}
+
+export interface IMigrationDetail extends IMigrationInfo {
+  filePath: string
 }

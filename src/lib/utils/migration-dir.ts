@@ -1,13 +1,15 @@
-import { Db } from 'mongodb'
+import { Db, MongoClient as DbClient } from 'mongodb'
 import { mkdirSync } from 'fs'
 import { readdir } from 'fs/promises'
 
 import isFileExist from './file'
-import { IMigrationInfo } from '../../interface'
+import { IMigrationInfo, IOption } from '../../interface'
 import configHelper from '../helpers/config-helper'
 
 export const MIGRATION_NATIVE_FILE_PREFIX = '_nat'
 export const nativeDetectionRegexPattern: RegExp = new RegExp(`^\\d{13}${MIGRATION_NATIVE_FILE_PREFIX}-(.+)`)
+
+export type MongoClient = DbClient & { customOptions?: IOption }
 
 export async function migrationDirExist() {
   const config = configHelper.readConfig()

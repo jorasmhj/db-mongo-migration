@@ -1,54 +1,103 @@
 import path from 'path'
 import chalk from 'chalk'
 import * as tsImport from 'ts-import'
-import { ClientSession, Db, MongoClient, ObjectId } from 'mongodb'
+import { ClientSession, Db, ObjectId } from 'mongodb'
 
 import DB from '../helpers/db-helper'
 import configHelper from '../helpers/config-helper'
-import { IMigration, IMigrationInfo, INativeMigration } from '../../interface'
+import { IMigration, IMigrationDetail, IMigrationInfo, INativeMigration } from '../../interface'
 import isFileExist, { removeDirectory } from '../utils/file'
-import { getLatestMigrationBatch, getLatestMigrations, getMigrationForFile, nativeDetectionRegexPattern } from '../utils/migration-dir'
+import { MongoClient, getLatestMigrationBatch, getLatestMigrations, getMigrationForFile, nativeDetectionRegexPattern } from '../utils/migration-dir'
 import { handleDbTransaction } from '../helpers/db-session-helper'
 
 export default async function down(db: Db, dbClient: MongoClient, options: any) {
   try {
+    dbClient.customOptions = options
     const config = configHelper.readConfig()
-    const migrationsToRollback = await getMigrationsToRollback(db, options)
+    const hasGlobalTransaction = config.useDefaultTransaction || options.dryRun ? true : false
 
-    const uniqueMigrationIds = migrationsToRollback.map(m => m._id)
+    console.log(`${options.dryRun ? 'Dry run initiated!' : config.useDefaultTransaction ? 'Running with global session' : 'Running without global session'}\n`)
 
-    await handleDbTransaction(dbClient, session => rollbackMigrations(migrationsToRollback, db, dbClient, config, options, session), options)
+    const allMigrationsToRollback = await getMigrationsToRollback(db, options)
+    const migrationsToRollback: IMigrationDetail[] = []
+    const nativeMigrationsToRollback: IMigrationDetail[] = []
 
-    await db.collection(config.changelogCollectionName).deleteMany({ _id: { $in: uniqueMigrationIds as unknown as ObjectId[] } })
+    //Separate out the custom migrations from the native once
+    allMigrationsToRollback.forEach(m => {
+      const filePath = `${config.migrationsDir}/${m.fileName}`
+      if (isFileExist(path.resolve(filePath))) {
+        const migrationData = { ...m, filePath }
+        if (nativeDetectionRegexPattern.test(m.fileName)) nativeMigrationsToRollback.push(migrationData)
+        else migrationsToRollback.push(migrationData)
+      } else {
+        console.log(chalk.yellow(`${m.fileName} not found, skipping..`))
+      }
+    })
+
+    if (nativeMigrationsToRollback.length) {
+      const uniqueMigrationIds = await rollbackMigrations(nativeMigrationsToRollback, db, dbClient)
+      await db.collection(config.changelogCollectionName).deleteMany({ _id: { $in: uniqueMigrationIds as unknown as ObjectId[] } })
+    }
+
+    if (migrationsToRollback.length) {
+      const uniqueMigrationIds = await (hasGlobalTransaction
+        ? handleDbTransaction(dbClient, session => rollbackMigrationsWithSession(migrationsToRollback, db, dbClient, session))
+        : rollbackMigrations(migrationsToRollback, db, dbClient))
+      await db.collection(config.changelogCollectionName).deleteMany({ _id: { $in: uniqueMigrationIds as unknown as ObjectId[] } })
+    }
   } finally {
     await removeDirectory('.cache', { recursive: true })
   }
 }
 
-async function rollbackMigrations(migrationsToRollback: IMigrationInfo[], db: Db, dbClient: MongoClient, config: any, options: any, session?: ClientSession) {
-  const model = new DB(db, session)
+async function rollbackMigrations(migrationsToRollback: IMigrationDetail[], db: Db, dbClient: MongoClient) {
+  const model = new DB(db)
+  const uniqueMigrationIds = []
 
   for (const appliedMigration of migrationsToRollback) {
+    let isProcessed = true
     console.log(`${chalk.yellow(`Rolling back: `)} ${appliedMigration.fileName}`)
-    const filePath = `${config.migrationsDir}/${appliedMigration.fileName}`
-    if (!isFileExist(path.resolve(filePath))) {
-      console.log(chalk.yellow(`${appliedMigration.fileName} not found, skipping..`))
-      continue
+
+    try {
+      // const { default: Migration } = await tsImport.load(filePath)
+      const importedObject = await import(path.resolve(appliedMigration.filePath))
+
+      if (nativeDetectionRegexPattern.test(appliedMigration.fileName)) {
+        await downNativeMigration(importedObject, db, dbClient)
+      } else {
+        await downMigration(importedObject, model, dbClient)
+      }
+    } catch (err) {
+      console.log(`${chalk.red(`Error: `)} ${err.message}`)
+      isProcessed = false
     }
 
-    if (nativeDetectionRegexPattern.test(appliedMigration.fileName)) {
-      const { default: NativeMigration } = await import(path.resolve(filePath))
-      const nativeMigration: INativeMigration = new NativeMigration()
-      await nativeMigration.down(db, dbClient, options)
+    if (isProcessed) {
+      uniqueMigrationIds.push(appliedMigration._id)
+      console.log(`${chalk.green(`Rolled back:  `)} ${appliedMigration.fileName}`)
     } else {
-      // const { default: Migration } = await tsImport.load(filePath)
-      const { default: Migration } = await import(path.resolve(filePath))
-      const migration: IMigration = new Migration()
-      await migration.down(model)
+      console.log(`${chalk.red(`Roll back failed: `)} ${appliedMigration.fileName}`)
     }
+  }
+
+  return uniqueMigrationIds
+}
+
+async function rollbackMigrationsWithSession(migrationsToRollback: IMigrationDetail[], db: Db, dbClient: MongoClient, session: ClientSession) {
+  const model = new DB(db, session)
+  const uniqueMigrationIds = []
+  for (const appliedMigration of migrationsToRollback) {
+    console.log(`${chalk.yellow(`Rolling back: `)} ${appliedMigration.fileName}`)
+
+    // const { default: Migration } = await tsImport.load(filePath)
+    const importedObject = await import(path.resolve(appliedMigration.filePath))
+    await downMigration(importedObject, model, dbClient)
 
     console.log(`${chalk.green(`Rolled back:  `)} ${appliedMigration.fileName}`)
+    uniqueMigrationIds.push(appliedMigration._id)
   }
+
+  return uniqueMigrationIds
 }
 
 async function getMigrationsToRollback(db: Db, options: any) {
@@ -61,4 +110,15 @@ async function getMigrationsToRollback(db: Db, options: any) {
         : await getLatestMigrations(db, options.steps)
 
   return migrationsToRollback
+}
+
+async function downMigration({ default: Migration }: any, model: DB, dbClient: MongoClient) {
+  const migration: IMigration = new Migration()
+  if (migration.down.length > 1) await migration.down(model, dbClient)
+  else await migration.down(model)
+}
+
+async function downNativeMigration({ default: NativeMigration }: any, db: Db, dbClient: MongoClient) {
+  const nativeMigration: INativeMigration = new NativeMigration()
+  await nativeMigration.down(db, dbClient)
 }
