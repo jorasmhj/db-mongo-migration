@@ -65,6 +65,7 @@ db-connection:
 migrationsDir: migrations
 changelogCollectionName: migrations
 projectName: YOUR-PROJECT-NAME
+useDefaultTransaction: true
 ```
 
 You can use `.env` to auto populate the environment variables
@@ -80,7 +81,7 @@ npx mongo-migrate create [name]
 Replace `[name]` with the name of your migration. This will create a new migration file in the `migrations` directory.
 
 #### Options
-- `-n, -native`: Create migration file for native Mongo DB operation.
+- `-n, -native`: Create migration file for native Mongo DB operation (WIP).
 
 Without option -n, it will create a file with following content:
 
@@ -117,23 +118,23 @@ Without option -n, it will create a file with following content:
   <td>
 
   ```javascript
-  import { INativeMigration, DbSessionHelper, IOption } from "db-mongo-migration"
-  import {  Db, MongoClient } from 'mongodb';
+  import { INativeMigration, DbSessionHelper, MongoClient } from "db-mongo-migration"
+  import { Db } from 'mongodb';
 
   class NativeMigration implements INativeMigration {
     /**
      * Run the migrations.
      */
-    async up(db: Db, client: MongoClient, option?: IOption) {
-      new DbSessionHelper(client).createAndCommitTransaction(async session => {
+    async up(db: Db, client: MongoClient) {
+      return await handleDbTransaction(client, async session => {
           // YOUR CODE HERE
-        }, option );
+        });
     }
 
     /**
      * Reverse the migrations.
      */
-    async down(db: Db, client: MongoClient, option?: IOption) {
+    async down(db: Db, client: MongoClient) {
       // YOUR CODE HERE
     }
   }
@@ -144,7 +145,7 @@ Without option -n, it will create a file with following content:
 </tr>
 <tr>
   <td> -> System handles the entire Transaction Session </td>
-  <td> -> Need to manually handle the Transaction Session </td>
+  <td> -> Should pass client.globalSession to give system the control to handle the transaction session </td>
 </tr>
 </table>
 

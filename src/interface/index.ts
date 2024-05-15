@@ -1,6 +1,7 @@
-import { Db, MongoClient } from 'mongodb'
+import { Db } from 'mongodb'
 import FileExtension from '../enums/file-extension'
 import DB from '../lib/helpers/db-helper'
+import { MongoClient } from '../lib/utils/migration-dir'
 
 export interface IOption {
   dryRun: boolean
@@ -12,8 +13,8 @@ export interface IMigration {
 }
 
 export interface INativeMigration {
-  up: (db: Db, dbClient: MongoClient, options?: IOption) => Promise<any>
-  down: (db: Db, dbClient: MongoClient, options?: IOption) => Promise<any>
+  up: (db: Db, dbClient: MongoClient) => Promise<any>
+  down: (db: Db, dbClient: MongoClient) => Promise<any>
 }
 
 export interface IConfiguration {

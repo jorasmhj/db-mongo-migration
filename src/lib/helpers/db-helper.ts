@@ -23,7 +23,10 @@ import {
 } from 'mongodb'
 
 class DB {
-  constructor(public db: Db, private session?: ClientSession) {}
+  constructor(
+    public db: Db,
+    private session?: ClientSession
+  ) {}
 
   bulkWrite(collection: string, operations: AnyBulkWriteOperation<Document>[], options?: BulkWriteOptions) {
     return this.db.collection(collection).bulkWrite(operations, { ...options, session: this.session })

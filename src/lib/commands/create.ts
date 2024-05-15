@@ -17,6 +17,9 @@ function resolveMigrationFile(fileExtension: FileExtension, options: any) {
 
 export default async function create(name: string, options: any) {
   try {
+    //DISABLED NATIVE FEATURE | Reason: Need to handle the global transaction commitment
+    options.native = false
+
     const config = configHelper.readConfig()
     if (!config) return console.error('Migration not initialized yet.')
 

@@ -32,7 +32,7 @@ async function commitWithRetry(session: ClientSession, option?: IOption) {
  * @returns The result of the callback function is being returned.
  * @throws An error if the transaction is aborted or fails.
  */
-async function handleDbTransaction(dbClient: MongoClient, callback: (arg0: ClientSession) => any, clientSessionOption?: ClientSessionOptions) {
+async function handleDbTransaction(dbClient: MongoClient, callback: (session: ClientSession) => any, clientSessionOption?: ClientSessionOptions) {
   if (dbClient) {
     const session = dbClient.startSession(clientSessionOption)
     session.startTransaction()
