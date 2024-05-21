@@ -1,10 +1,15 @@
-import { Db } from 'mongodb'
+import { ClientSession, Db, MongoClient as DbClient } from 'mongodb'
 import { mkdirSync } from 'fs'
 import { readdir } from 'fs/promises'
 
 import isFileExist from './file'
-import { IMigrationInfo } from '../../interface'
+import { IMigrationInfo, IOption } from '../../interface'
 import configHelper from '../helpers/config-helper'
+
+export const MIGRATION_NATIVE_FILE_PREFIX = '_nat'
+export const nativeDetectionRegexPattern: RegExp = new RegExp(`^\\d{13}${MIGRATION_NATIVE_FILE_PREFIX}-(.+)`)
+
+export type MongoClient = DbClient & { customOptions?: IOption; globalSession?: ClientSession }
 
 export async function migrationDirExist() {
   const config = configHelper.readConfig()
@@ -70,9 +75,7 @@ export async function getLatestMigrations(db: Db, limit: number = 1) {
   const config = configHelper.readConfig()
   if (!config) throw console.error('Migration not initialized yet.')
 
-  return db.collection(config.changelogCollectionName).find({}).sort({ _id: -1 }).limit(limit).toArray() as unknown as Promise<
-    IMigrationInfo[]
-  >
+  return db.collection(config.changelogCollectionName).find({}).sort({ _id: -1 }).limit(limit).toArray() as unknown as Promise<IMigrationInfo[]>
 }
 
 export async function getMigrationForFile(fileName: string, db: Db) {

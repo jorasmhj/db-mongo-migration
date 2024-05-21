@@ -31,8 +31,5 @@ export default async function status(db: Db, options?: any) {
     return acc
   }, [])
 
-  return [
-    ...unAppliedMigrations,
-    ...appliedMigrations.map(m => ({ fileName: m.fileName, appliedAt: m.appliedAt + '', batchId: m.batchId }))
-  ]
+  return [...unAppliedMigrations, ...appliedMigrations.map(m => ({ fileName: m.fileName, appliedAt: m.appliedAt + '', batchId: m.batchId }))]
 }

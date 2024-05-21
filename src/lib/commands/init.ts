@@ -12,5 +12,5 @@ export default async function init() {
 
   copyFileSync(source, destination)
 
-  return console.log('Migration sucessfully initialized')
+  return console.log('Migration successfully initialized')
 }
