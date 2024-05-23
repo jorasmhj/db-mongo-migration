@@ -1,0 +1,13 @@
+class NativeMigration {
+  /**
+   * Run the migrations.
+   */
+  async up(db, client, option) {}
+
+  /**
+   * Reverse the migrations.
+   */
+  async down(db, client, option) {}
+}
+
+export default NativeMigration

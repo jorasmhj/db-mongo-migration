@@ -1,15 +1,15 @@
-import { IMigration, DB } from "db-mongo-migration"
+import { IMigration, DB, MongoClient } from "db-mongo-migration"
 
 class Migration implements IMigration {
   /**
    * Run the migrations.
    */
-  async up(db: DB) {}
+  async up(db: DB, client?: MongoClient) {}
 
   /**
    * Reverse the migrations.
    */
-  async down(db: DB) {}
+  async down(db: DB, client?: MongoClient) {}
 }
 
 export default Migration

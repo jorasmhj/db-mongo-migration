@@ -1,10 +1,11 @@
 db-connection:
-  url: mongodb://localhost:27018/users?authMechanism=DEFAULT&directConnection=true
-  databaseName: testDb
+  url: ${URL}
+  databaseName: ${DB_NAME}
   options:
     useNewUrlParser: true
     useUnifiedTopology: true
 
-migrationsDir: src/migrations
+migrationsDir: migrations
 changelogCollectionName: migrations
-useDefaultTransaction: false
+projectName: Joras
+useDefaultTransaction: true

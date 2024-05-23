@@ -5,14 +5,26 @@ import { copyFileSync, mkdirSync } from 'fs'
 import isFileExist from '../utils/file'
 import configHelper from '../helpers/config-helper'
 import FileExtension from '../../enums/file-extension'
+import { MIGRATION_NATIVE_FILE_PREFIX } from '../utils/migration-dir'
+
+function resolveMigrationFile(fileExtension: FileExtension, options: any) {
+  if (fileExtension === FileExtension.TS) {
+    return options.native ? '../../samples/native-migration.txt' : '../../samples/migration.txt'
+  } else {
+    return options.native ? '../../samples/native-migration.js.txt' : '../../samples/migration.js.txt'
+  }
+}
 
 export default async function create(name: string, options: any) {
   try {
+    //DISABLED NATIVE FEATURE | Reason: Need to handle the global transaction commitment
+    options.native = false
+
     const config = configHelper.readConfig()
     if (!config) return console.error('Migration not initialized yet.')
 
     const migrationDirPath = config.migrationsDir
-    const sampleFile = config.fileExtension === FileExtension.TS ? '../../samples/migration.txt' : '../../samples/migration.js.txt'
+    const sampleFile = resolveMigrationFile(config.fileExtension, options)
 
     if (!isFileExist(migrationDirPath)) {
       mkdirSync(migrationDirPath)
@@ -21,7 +33,8 @@ export default async function create(name: string, options: any) {
     const source = path.join(__dirname, sampleFile)
 
     const currentTimestamp = new Date().getTime()
-    const filename = `${migrationDirPath}/${currentTimestamp}-${name}.${config.fileExtension}`
+    const native = options.native ? MIGRATION_NATIVE_FILE_PREFIX : ''
+    const filename = `${migrationDirPath}/${currentTimestamp}${native}-${name}.${config.fileExtension}`
     const destination = path.join(process.cwd(), filename)
 
     copyFileSync(source, destination)

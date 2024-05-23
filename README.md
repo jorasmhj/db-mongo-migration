@@ -64,6 +64,8 @@ db-connection:
 
 migrationsDir: migrations
 changelogCollectionName: migrations
+projectName: YOUR-PROJECT-NAME
+useDefaultTransaction: true
 ```
 
 You can use `.env` to auto populate the environment variables
@@ -77,6 +79,76 @@ npx mongo-migrate create [name]
 ```
 
 Replace `[name]` with the name of your migration. This will create a new migration file in the `migrations` directory.
+
+#### Options
+- `-n, -native`: Create migration file for native Mongo DB operation (WIP).
+
+Without option -n, it will create a file with following content:
+
+<table>
+<tr>
+  <th>Without option -n</th>
+  <th>With native support (-n)</th>
+</tr>
+<tr>
+  <td>
+
+  ```javascript
+    import { IMigration, DB } from "db-mongo-migration"
+
+    class Migration implements IMigration {
+      /**
+      * Run the migrations.
+      */
+      async up(db: DB) {
+        // YOUR CODE HERE
+      }
+
+      /**
+      * Reverse the migrations.
+      */
+      async down(db: DB) {
+        // YOUR CODE HERE
+      }
+    }
+
+    export default Migration;
+  ```
+  </td>
+  <td>
+
+  ```javascript
+  import { INativeMigration, DbSessionHelper, MongoClient } from "db-mongo-migration"
+  import { Db } from 'mongodb';
+
+  class NativeMigration implements INativeMigration {
+    /**
+     * Run the migrations.
+     */
+    async up(db: Db, client: MongoClient) {
+      return await handleDbTransaction(client, async session => {
+          // YOUR CODE HERE
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    async down(db: Db, client: MongoClient) {
+      // YOUR CODE HERE
+    }
+  }
+
+  export default NativeMigration;
+  ```
+  </td>
+</tr>
+<tr>
+  <td> -> System handles the entire Transaction Session </td>
+  <td> -> Should pass client.globalSession to give system the control to handle the transaction session </td>
+</tr>
+</table>
+
 
 ### Get Migration Status
 
