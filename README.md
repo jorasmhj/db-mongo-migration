@@ -88,7 +88,7 @@ Without option -n, it will create a file with following content:
 <table>
 <tr>
   <th>Without option -n</th>
-  <th>With native support (-n)</th>
+  <th>With native support (-n) - WIP</th>
 </tr>
 <tr>
   <td>
