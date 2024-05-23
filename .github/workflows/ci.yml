@@ -31,9 +31,9 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Use NodeJs
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: 20
       - run: yarn
 
       - name: Build Project
