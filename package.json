@@ -52,7 +52,7 @@
     "dotenv": "^16.4.5",
     "figlet": "^1.7.0",
     "mongodb": "^6.6.2",
-    "ts-import": "^5.0.0-beta.0",
+    "ts-import": "^4.0.0-beta.10",
     "typescript": "^5.4.5",
     "yaml-env-defaults": "^2.0.5"
   },
