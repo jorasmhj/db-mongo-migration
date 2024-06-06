@@ -11,7 +11,7 @@ import {
   MongoClient,
   getLatestMigrationBatch,
   getLatestMigrations,
-  getEffectiveMigrationDir,
+  getEffectiveMigrationsDir,
   getMigrationForFile,
   nativeDetectionRegexPattern
 } from '../utils/migration-dir'
@@ -30,7 +30,7 @@ export default async function down(db: Db, dbClient: MongoClient, options: any) 
     const allMigrationsToRollback = await getMigrationsToRollback(db, options)
     const migrationsToRollback: IMigrationDetail[] = []
 
-    const migrationDirPath = getEffectiveMigrationDir()
+    const migrationDirPath = getEffectiveMigrationsDir()
 
     allMigrationsToRollback.forEach(m => {
       const filePath = `${migrationDirPath}/${m.fileName}`

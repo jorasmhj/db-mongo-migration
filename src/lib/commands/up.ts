@@ -8,7 +8,7 @@ import DB from '../helpers/db-helper'
 import { removeDirectory } from '../utils/file'
 import configHelper from '../helpers/config-helper'
 import { IMigration, IMigrationDetail, IMigrationInfo, INativeMigration } from '../../interface'
-import { MongoClient, getEffectiveMigrationDir, nativeDetectionRegexPattern } from '../utils/migration-dir'
+import { MongoClient, getEffectiveMigrationsDir, nativeDetectionRegexPattern } from '../utils/migration-dir'
 import { handleDbTransaction } from '../helpers/db-session-helper'
 
 async function process(db: Db, dbClient: MongoClient, unAppliedMigrations: IMigrationDetail[], batchId: number) {
@@ -62,7 +62,7 @@ export default async function up(db: Db, dbClient: MongoClient, options: any) {
   const latestBatchId = allMigrations.filter(m => m.appliedAt !== 'PENDING')[0]
   const batchId = !latestBatchId?.batchId ? 1 : +latestBatchId.batchId + 1
 
-  const migrationDirPath = getEffectiveMigrationDir()
+  const migrationDirPath = getEffectiveMigrationsDir()
 
   const unAppliedMigrations: IMigrationDetail[] = allMigrations
     .filter(m => (options.file ? m.appliedAt === 'PENDING' && m.fileName === options.file : m.appliedAt === 'PENDING'))
