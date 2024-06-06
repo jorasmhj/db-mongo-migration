@@ -15,6 +15,7 @@ const program = new Command()
 
 // const { projectName } = configHelper.readConfig()
 // const figletPrefix = projectName ? `${projectName}-` : ''
+
 console.log(figlet.textSync('Mongo-Migrate'))
 
 program.version('1.0.0')
