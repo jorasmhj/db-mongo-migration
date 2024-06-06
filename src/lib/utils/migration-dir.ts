@@ -11,6 +11,12 @@ export const nativeDetectionRegexPattern: RegExp = new RegExp(`^\\d{13}${MIGRATI
 
 export type MongoClient = DbClient & { customOptions?: IOption; globalSession?: ClientSession }
 
+export async function getEffectiveMigrationDir() {
+  const config = configHelper.readConfig()
+
+  return config.compiledMigrationsDir ?? config.migrationsDir
+}
+
 export async function migrationDirExist() {
   const config = configHelper.readConfig()
   if (!config) return console.error('Migration not initialized yet.')
