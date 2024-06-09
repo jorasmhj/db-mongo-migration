@@ -13,9 +13,10 @@ import configHelper from '../lib/helpers/config-helper'
 
 const program = new Command()
 
-const { projectName } = configHelper.readConfig()
-const figletPrefix = projectName ? `${projectName}-` : ''
-console.log(figlet.textSync(`${figletPrefix}Mongo-Migrate`))
+// const { projectName } = configHelper.readConfig()
+// const figletPrefix = projectName ? `${projectName}-` : ''
+
+console.log(figlet.textSync('Mongo-Migrate'))
 
 program.version('1.0.0')
 program.command('init').description('Initialize migration config').action(init)

@@ -6,5 +6,6 @@ db-connection:
     useUnifiedTopology: true
 
 migrationsDir: migrations
+compiledMigrationsDir: 
 changelogCollectionName: migrations
 useDefaultTransaction: true
