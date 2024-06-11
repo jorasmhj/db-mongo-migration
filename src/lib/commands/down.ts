@@ -7,7 +7,14 @@ import DB from '../helpers/db-helper'
 import configHelper from '../helpers/config-helper'
 import { IMigration, IMigrationDetail, INativeMigration } from '../../interface'
 import isFileExist, { removeDirectory } from '../utils/file'
-import { MongoClient, getLatestMigrationBatch, getLatestMigrations, getMigrationForFile, nativeDetectionRegexPattern } from '../utils/migration-dir'
+import {
+  MongoClient,
+  getLatestMigrationBatch,
+  getLatestMigrations,
+  getEffectiveMigrationsDir,
+  getMigrationForFile,
+  nativeDetectionRegexPattern
+} from '../utils/migration-dir'
 import { handleDbTransaction } from '../helpers/db-session-helper'
 
 export default async function down(db: Db, dbClient: MongoClient, options: any) {
@@ -23,8 +30,10 @@ export default async function down(db: Db, dbClient: MongoClient, options: any) 
     const allMigrationsToRollback = await getMigrationsToRollback(db, options)
     const migrationsToRollback: IMigrationDetail[] = []
 
+    const migrationDirPath = getEffectiveMigrationsDir()
+
     allMigrationsToRollback.forEach(m => {
-      const filePath = `${config.migrationsDir}/${m.fileName}`
+      const filePath = `${migrationDirPath}/${m.fileName}`
       if (isFileExist(path.resolve(filePath))) {
         migrationsToRollback.push({ ...m, filePath })
       } else {

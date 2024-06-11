@@ -21,6 +21,7 @@ export interface IConfiguration {
   'db-connection': IDbConnection
   useFileHash: boolean
   migrationsDir: string
+  compiledMigrationsDir?: string
   changelogCollectionName: string
   fileExtension?: FileExtension
   projectName?: string
