@@ -21,7 +21,9 @@ async function process(db: Db, dbClient: MongoClient, unAppliedMigrations: IMigr
       let isProcessed = true
       try {
         console.log(`${chalk.yellow(`Migrating: `)} ${unAppliedMigration.fileName}`)
-        const migrationObject = await tsImport.load(path.resolve(unAppliedMigration.filePath))
+        const migrationObject = await tsImport.load(path.resolve(unAppliedMigration.filePath), {
+          mode: tsImport.LoadMode.Compile
+        })
 
         if (nativeDetectionRegexPattern.test(unAppliedMigration.fileName)) {
           await upNativeMigration(migrationObject, db, dbClient)
