@@ -66,7 +66,9 @@ async function rollbackMigrations(migrationsToRollback: IMigrationDetail[], db: 
     console.log(`${chalk.yellow(`Rolling back: `)} ${appliedMigration.fileName}`)
 
     try {
-      const importedObject = await tsImport.load(path.resolve(appliedMigration.filePath))
+      const importedObject = await tsImport.load(path.resolve(appliedMigration.filePath), {
+        mode: tsImport.LoadMode.Compile
+      })
 
       if (nativeDetectionRegexPattern.test(appliedMigration.fileName)) {
         await downNativeMigration(importedObject, db, dbClient)
