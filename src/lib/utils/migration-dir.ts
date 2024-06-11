@@ -11,7 +11,7 @@ export const nativeDetectionRegexPattern: RegExp = new RegExp(`^\\d{13}${MIGRATI
 
 export type MongoClient = DbClient & { customOptions?: IOption; globalSession?: ClientSession }
 
-export async function getEffectiveMigrationsDir() {
+export function getEffectiveMigrationsDir() {
   const config = configHelper.readConfig()
 
   return config.compiledMigrationsDir ?? config.migrationsDir
