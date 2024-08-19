@@ -3,13 +3,13 @@ import { mkdirSync } from 'fs'
 import { readdir } from 'fs/promises'
 
 import isFileExist from './file'
-import { IMigrationInfo, IOption } from '../../interface'
+import { IMigrationInfo, IMigrationOptions } from '../../interface'
 import configHelper from '../helpers/config-helper'
 
 export const MIGRATION_NATIVE_FILE_PREFIX = '_nat'
 export const nativeDetectionRegexPattern: RegExp = new RegExp(`^\\d{13}${MIGRATION_NATIVE_FILE_PREFIX}-(.+)`)
 
-export type MongoClient = DbClient & { customOptions?: IOption; globalSession?: ClientSession }
+export type MongoClient = DbClient & { customOptions?: IMigrationOptions; globalSession?: ClientSession }
 
 export function getEffectiveMigrationsDir() {
   const config = configHelper.readConfig()

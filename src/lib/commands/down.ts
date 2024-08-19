@@ -5,7 +5,7 @@ import { Db, ObjectId } from 'mongodb'
 
 import DB from '../helpers/db-helper'
 import configHelper from '../helpers/config-helper'
-import { IMigration, IMigrationDetail, INativeMigration } from '../../interface'
+import { IMigration, IMigrationDetail, IMigrationOptions, INativeMigration } from '../../interface'
 import isFileExist, { removeDirectory } from '../utils/file'
 import {
   MongoClient,
@@ -17,7 +17,7 @@ import {
 } from '../utils/migration-dir'
 import { handleDbTransaction } from '../helpers/db-session-helper'
 
-export default async function down(db: Db, dbClient: MongoClient, options: any) {
+export default async function down(db: Db, dbClient: MongoClient, options: IMigrationOptions) {
   try {
     dbClient.customOptions = options
     const config = configHelper.readConfig()
@@ -94,7 +94,7 @@ async function rollbackMigrations(migrationsToRollback: IMigrationDetail[], db: 
   return uniqueMigrationIds
 }
 
-async function getMigrationsToRollback(db: Db, options: any) {
+async function getMigrationsToRollback(db: Db, options: IMigrationOptions) {
   const migrationsToRollback = options.file
     ? await getMigrationForFile(options.file, db)
     : options.reset
