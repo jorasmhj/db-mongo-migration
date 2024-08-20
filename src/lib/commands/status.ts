@@ -4,7 +4,7 @@ import { IMigrationStatus } from '../../interface'
 import configHelper from '../helpers/config-helper'
 import { getAppliedMigrations, getMigrationFiles } from '../utils/migration-dir'
 
-export default async function status(db: Db, options?: any) {
+export default async function status(db: Db) {
   const config = configHelper.readConfig()
   let [migrationFiles, appliedMigrations] = await Promise.all([getMigrationFiles(), getAppliedMigrations(db)])
 

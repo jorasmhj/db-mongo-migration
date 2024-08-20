@@ -21,7 +21,6 @@ export default async function create(name: string, options: any) {
     options.native = false
 
     const config = configHelper.readConfig()
-    if (!config) return console.error('Migration not initialized yet.')
 
     const migrationDirPath = config.migrationsDir
     const sampleFile = resolveMigrationFile(config.fileExtension, options)

@@ -3,13 +3,13 @@ import { mkdirSync } from 'fs'
 import { readdir } from 'fs/promises'
 
 import isFileExist from './file'
-import { IMigrationInfo, IOption } from '../../interface'
+import { IMigrationInfo, IMigrationOptions } from '../../interface'
 import configHelper from '../helpers/config-helper'
 
 export const MIGRATION_NATIVE_FILE_PREFIX = '_nat'
 export const nativeDetectionRegexPattern: RegExp = new RegExp(`^\\d{13}${MIGRATION_NATIVE_FILE_PREFIX}-(.+)`)
 
-export type MongoClient = DbClient & { customOptions?: IOption; globalSession?: ClientSession }
+export type MongoClient = DbClient & { customOptions?: IMigrationOptions; globalSession?: ClientSession }
 
 export function getEffectiveMigrationsDir() {
   const config = configHelper.readConfig()
@@ -36,17 +36,18 @@ export async function createMigrationDir() {
 
 export async function getMigrationFiles() {
   const config = configHelper.readConfig()
-  if (!config) throw console.error('Migration not initialized yet.')
+  try {
+    const migrationDirPath = config.migrationsDir
+    const files = await readdir(migrationDirPath)
 
-  const migrationDirPath = config.migrationsDir
-  const files = await readdir(migrationDirPath)
-
-  return files.sort()
+    return files.sort()
+  } catch (error) {
+    throw new Error('Seems like you have not created any migration yet. Please run `mongo-migrate create` command.')
+  }
 }
 
 export async function getAppliedMigrations(db: Db): Promise<IMigrationInfo[]> {
   const config = configHelper.readConfig()
-  if (!config) throw console.error('Migration not initialized yet.')
 
   return db.collection(config.changelogCollectionName).find({}).sort({ _id: -1 }).toArray() as unknown as Promise<IMigrationInfo[]>
 }
@@ -79,7 +80,6 @@ export async function getLatestMigrationBatch(db: Db, limit: number = 1) {
 
 export async function getLatestMigrations(db: Db, limit: number = 1) {
   const config = configHelper.readConfig()
-  if (!config) throw console.error('Migration not initialized yet.')
 
   return db.collection(config.changelogCollectionName).find({}).sort({ _id: -1 }).limit(limit).toArray() as unknown as Promise<IMigrationInfo[]>
 }

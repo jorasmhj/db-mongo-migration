@@ -5,8 +5,9 @@ import { Db, ObjectId } from 'mongodb'
 
 import DB from '../helpers/db-helper'
 import configHelper from '../helpers/config-helper'
-import { IMigration, IMigrationDetail, INativeMigration } from '../../interface'
 import isFileExist, { removeDirectory } from '../utils/file'
+import { handleDbTransaction } from '../helpers/db-session-helper'
+import { IMigration, IMigrationDetail, IMigrationOptions, INativeMigration } from '../../interface'
 import {
   MongoClient,
   getLatestMigrationBatch,
@@ -15,9 +16,8 @@ import {
   getMigrationForFile,
   nativeDetectionRegexPattern
 } from '../utils/migration-dir'
-import { handleDbTransaction } from '../helpers/db-session-helper'
 
-export default async function down(db: Db, dbClient: MongoClient, options: any) {
+export default async function down(db: Db, dbClient: MongoClient, options: IMigrationOptions) {
   try {
     dbClient.customOptions = options
     const config = configHelper.readConfig()
@@ -42,15 +42,12 @@ export default async function down(db: Db, dbClient: MongoClient, options: any) 
     })
 
     if (migrationsToRollback.length) {
-      const uniqueMigrationIds: string[] = await (hasGlobalTransaction
+      await (hasGlobalTransaction
         ? handleDbTransaction(dbClient, async session => {
             dbClient.globalSession = session
             return await rollbackMigrations(migrationsToRollback, db, dbClient)
           })
         : rollbackMigrations(migrationsToRollback, db, dbClient))
-
-      if (uniqueMigrationIds.length)
-        await db.collection(config.changelogCollectionName).deleteMany({ _id: { $in: uniqueMigrationIds as unknown as ObjectId[] } })
     }
   } finally {
     await removeDirectory('.cache', { recursive: true })
@@ -58,8 +55,8 @@ export default async function down(db: Db, dbClient: MongoClient, options: any) 
 }
 
 async function rollbackMigrations(migrationsToRollback: IMigrationDetail[], db: Db, dbClient: MongoClient) {
+  const config = configHelper.readConfig()
   const model = new DB(db, dbClient.globalSession)
-  const uniqueMigrationIds: string[] = []
 
   for (const appliedMigration of migrationsToRollback) {
     let isProcessed = true
@@ -84,17 +81,17 @@ async function rollbackMigrations(migrationsToRollback: IMigrationDetail[], db: 
     }
 
     if (isProcessed) {
-      uniqueMigrationIds.push(appliedMigration._id!)
+      await db
+        .collection(config.changelogCollectionName)
+        .deleteOne({ _id: appliedMigration._id! as unknown as ObjectId[] }, { session: dbClient.globalSession })
       console.log(`${chalk.green(`Rolled back:  `)} ${appliedMigration.fileName}`)
     } else {
       console.log(`${chalk.red(`Roll back failed: `)} ${appliedMigration.fileName}`)
     }
   }
-
-  return uniqueMigrationIds
 }
 
-async function getMigrationsToRollback(db: Db, options: any) {
+async function getMigrationsToRollback(db: Db, options: IMigrationOptions) {
   const migrationsToRollback = options.file
     ? await getMigrationForFile(options.file, db)
     : options.reset
