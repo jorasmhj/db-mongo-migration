@@ -9,18 +9,14 @@ import init from '../lib/commands/init'
 import down from '../lib/commands/down'
 import create from '../lib/commands/create'
 import status from '../lib/commands/status'
+import { sleep } from '../lib/utils/common'
 import { IMigrationOptions } from '../interface'
 import configHelper from '../lib/helpers/config-helper'
-import { sleep } from '../lib/utils/common'
 
 const program = new Command()
-
-// const { projectName } = configHelper.readConfig()
-// const figletPrefix = projectName ? `${projectName}-` : ''
-
+program.version('1.0.0')
 console.log(figlet.textSync('Mongo-Migrate'))
 
-program.version('1.0.0')
 program.command('init').description('Initialize migration config').action(init)
 
 program.command('create [name]').option('-n --native', 'Create migration file for native Mongo DB operation').description('Create a migration').action(create)
@@ -34,7 +30,11 @@ program
       const {
         'db-connection': { url, databaseName }
       } = configHelper.readConfig()
-      if (options.wait) await sleep(+options.wait * 1000)
+      if (options.wait) {
+        console.log(chalk.yellowBright(`Waiting for ${options.wait} seconds`))
+        await sleep(+options.wait * 1000)
+        console.log(chalk.greenBright('Wait completed'))
+      }
 
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
@@ -60,7 +60,11 @@ program
       const {
         'db-connection': { url, databaseName }
       } = configHelper.readConfig()
-      if (options.wait) await sleep(+options.wait * 1000)
+      if (options.wait) {
+        console.log(chalk.yellowBright(`Waiting for ${options.wait} seconds`))
+        await sleep(+options.wait * 1000)
+        console.log(chalk.greenBright('Wait completed'))
+      }
 
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
@@ -88,7 +92,11 @@ program
       const {
         'db-connection': { url, databaseName }
       } = configHelper.readConfig()
-      if (options.wait) await sleep(+options.wait * 1000)
+      if (options.wait) {
+        console.log(chalk.yellowBright(`Waiting for ${options.wait} seconds`))
+        await sleep(+options.wait * 1000)
+        console.log(chalk.greenBright('Wait completed'))
+      }
 
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
