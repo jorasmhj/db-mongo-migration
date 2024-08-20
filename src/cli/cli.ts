@@ -60,6 +60,7 @@ program
       const {
         'db-connection': { url, databaseName }
       } = configHelper.readConfig()
+
       if (options.wait) {
         console.log(chalk.yellowBright(`Waiting for ${options.wait} seconds`))
         await sleep(+options.wait * 1000)
