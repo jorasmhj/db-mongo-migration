@@ -11,6 +11,7 @@ import create from '../lib/commands/create'
 import status from '../lib/commands/status'
 import { IMigrationOptions } from '../interface'
 import configHelper from '../lib/helpers/config-helper'
+import { sleep } from '../lib/utils/common'
 
 const program = new Command()
 
@@ -27,11 +28,14 @@ program.command('create [name]').option('-n --native', 'Create migration file fo
 program
   .command('status')
   .description('Get migration status')
-  .action(async () => {
+  .option('-w --wait <seconds>', 'Wait to run migration')
+  .action(async (options: IMigrationOptions) => {
     try {
       const {
         'db-connection': { url, databaseName }
       } = configHelper.readConfig()
+      if (options.wait) await sleep(+options.wait * 1000)
+
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
       await mongoClient.connect()
@@ -49,12 +53,15 @@ program
   .command('up')
   .option('-f --file <filename>', 'Run migration for a specific file')
   .option('-d --dry-run', 'Run migration with a dry run')
+  .option('-w --wait <seconds>', 'Wait to run migration')
   .description('Run migration')
   .action(async (options: IMigrationOptions) => {
     try {
       const {
         'db-connection': { url, databaseName }
       } = configHelper.readConfig()
+      if (options.wait) await sleep(+options.wait * 1000)
+
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
       await mongoClient.connect()
@@ -74,12 +81,14 @@ program
   .option('-r --reset', 'Reset migration')
   .option('-b --batch <number>', 'Number of batch to rollback')
   .option('-s --steps <number>', 'Number of steps to rollback')
+  .option('-w --wait <seconds>', 'Wait to run migration')
   .action(async (options: IMigrationOptions) => {
     try {
       const opts: IMigrationOptions = {}
       const {
         'db-connection': { url, databaseName }
       } = configHelper.readConfig()
+      if (options.wait) await sleep(+options.wait * 1000)
 
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)

@@ -56,4 +56,5 @@ export interface IMigrationOptions {
   batch?: number
   steps?: number
   reset?: boolean
+  wait?: number
 }
