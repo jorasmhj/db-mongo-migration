@@ -9,6 +9,7 @@ import init from '../lib/commands/init'
 import down from '../lib/commands/down'
 import create from '../lib/commands/create'
 import status from '../lib/commands/status'
+import { IMigrationOptions } from '../interface'
 import configHelper from '../lib/helpers/config-helper'
 
 const program = new Command()
@@ -26,7 +27,7 @@ program.command('create [name]').option('-n --native', 'Create migration file fo
 program
   .command('status')
   .description('Get migration status')
-  .action(async options => {
+  .action(async () => {
     try {
       const {
         'db-connection': { url, databaseName }
@@ -34,7 +35,7 @@ program
       const mongoClient = new MongoClient(url, { maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 5000 })
       const dbInstance = mongoClient.db(databaseName)
       await mongoClient.connect()
-      const migrationStatus = await status(dbInstance, options)
+      const migrationStatus = await status(dbInstance)
 
       console.table(migrationStatus)
       process.exit(0)
@@ -49,7 +50,7 @@ program
   .option('-f --file <filename>', 'Run migration for a specific file')
   .option('-d --dry-run', 'Run migration with a dry run')
   .description('Run migration')
-  .action(async options => {
+  .action(async (options: IMigrationOptions) => {
     try {
       const {
         'db-connection': { url, databaseName }
@@ -73,9 +74,9 @@ program
   .option('-r --reset', 'Reset migration')
   .option('-b --batch <number>', 'Number of batch to rollback')
   .option('-s --steps <number>', 'Number of steps to rollback')
-  .action(async options => {
+  .action(async (options: IMigrationOptions) => {
     try {
-      const opts: any = {}
+      const opts: IMigrationOptions = {}
       const {
         'db-connection': { url, databaseName }
       } = configHelper.readConfig()
@@ -90,7 +91,7 @@ program
       if (options.batch || options.steps || options.reset) {
         if (options.reset) opts.reset = options.reset
         else if (options.batch) opts.batch = +options.batch
-        else opts.steps = +options.steps
+        else opts.steps = +options.steps!
       } else {
         opts.batch = 1
       }

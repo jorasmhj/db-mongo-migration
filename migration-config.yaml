@@ -8,4 +8,4 @@ db-connection:
 migrationsDir: migrations
 changelogCollectionName: migrations
 projectName: Joras
-useDefaultTransaction: true
+useDefaultTransaction: false

@@ -3,10 +3,6 @@ import FileExtension from '../enums/file-extension'
 import DB from '../lib/helpers/db-helper'
 import { MongoClient } from '../lib/utils/migration-dir'
 
-export interface IOption {
-  dryRun: boolean
-}
-
 export interface IMigration {
   up: (db: DB, dbClient?: MongoClient) => Promise<any>
   down: (db: DB, dbClient?: MongoClient) => Promise<any>
@@ -52,4 +48,12 @@ export interface IMigrationStatus {
 
 export interface IMigrationDetail extends IMigrationInfo {
   filePath: string
+}
+
+export interface IMigrationOptions {
+  file?: string
+  dryRun?: boolean
+  batch?: number
+  steps?: number
+  reset?: boolean
 }

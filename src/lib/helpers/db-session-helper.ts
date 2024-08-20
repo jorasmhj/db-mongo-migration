@@ -1,9 +1,9 @@
 import chalk from 'chalk'
-import { ClientSession, ClientSessionOptions } from 'mongodb'
-import { IOption } from '../../interface'
+import { IMigrationOptions } from '../../interface'
 import { MongoClient } from '../utils/migration-dir'
+import { ClientSession, ClientSessionOptions } from 'mongodb'
 
-async function commitWithRetry(session: ClientSession, option?: IOption) {
+async function commitWithRetry(session: ClientSession, option?: IMigrationOptions) {
   try {
     if (option?.dryRun) {
       await session.abortTransaction()
