@@ -1,7 +1,7 @@
 import chalk from 'chalk'
+import { IMigrationOptions } from '../../interface'
 import { MongoClient } from '../utils/migration-dir'
 import { ClientSession, ClientSessionOptions } from 'mongodb'
-import { IMigrationOptions } from '../../interface'
 
 async function commitWithRetry(session: ClientSession, option?: IMigrationOptions) {
   try {
