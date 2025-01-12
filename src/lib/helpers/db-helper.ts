@@ -4,6 +4,7 @@ import {
   BulkWriteOptions,
   ClientSession,
   CountDocumentsOptions,
+  CreateCollectionOptions,
   CreateIndexesOptions,
   Db,
   DeleteOptions,
@@ -17,6 +18,7 @@ import {
   IndexSpecification,
   InsertOneOptions,
   OptionalId,
+  RunCommandOptions,
   UpdateFilter,
   UpdateOptions,
   WithoutId
@@ -38,6 +40,36 @@ class DB {
 
   deleteOne(collection: string, filter?: Filter<Document>, options?: DeleteOptions) {
     return this.db.collection(collection).deleteOne(filter, { ...options, session: this.session })
+  }
+
+  /**
+   * create a collection (with options/settings).
+   * Example usage: (create users collection with only one field - email)
+   * db.createCollection("users", {
+      validator: {
+        $jsonSchema: {
+          bsonType: "object",
+          required: ["email"],
+          additionalProperties: false,
+          properties: {
+            email: {
+              bsonType: "string",
+              pattern: "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", // Ensures a valid email format
+              description: "Email must be a valid email address and is required."
+            }
+          }
+        }
+      },
+      validationLevel: "strict",
+      validationAction: "error"
+    });
+
+   * Visit https://www.mongodb.com/docs/manual/reference/command/create/ for more info
+   * @param name - name of the collectino
+   * @param options - collection creation settings
+   */
+  createCollection(name: string, options: CreateCollectionOptions) {
+    return this.db.createCollection(name, { ...options, session: this.session });
   }
 
   createIndex(collection: string, indexSpec: IndexSpecification, options?: CreateIndexesOptions) {
@@ -102,6 +134,27 @@ class DB {
 
   insertMany(collection: string, doc: OptionalId<Document>[], options?: BulkWriteOptions) {
     return this.db.collection(collection).insertMany(doc, { ...options, session: this.session })
+  }
+
+  /**
+   * Run any command provided by mongodb
+   * Example Usage (update schema for a collection):
+   * db.runCommand({
+      collMod: "collectionName",
+      validator: {
+        $jsonSchema: {
+          // Updated schema definition
+        }
+      },
+      validationLevel: "strict",
+      validationAction: "error"
+    });
+   * 
+   * @param command - the command to run
+   * @param options - optional settings for the command
+   */
+  runCommand(command: Document, options?: RunCommandOptions) {
+    return this.db.command(command, { ...options, session: this.session });
   }
 
   updateOne(collection: string, filter: Filter<Document>, update: UpdateFilter<Document>, options?: UpdateOptions) {
