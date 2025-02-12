@@ -99,7 +99,8 @@ class DB {
    * @returns array of search indexes present in the collection
    */
   listAllSearchIndexes(collection: string, options: ListSearchIndexesOptions): ListSearchIndexesCursor {
-    return this.db.collection(collection).listSearchIndexes({ ...options, session: this.session});
+-    return this.db.collection(collection).listSearchIndexes({ ...options, session: this.session});
++    return this.db.collection(collection).listSearchIndexes(options);
   }
 
   /**
