@@ -18,6 +18,7 @@ import {
   IndexSpecification,
   InsertOneOptions,
   ListSearchIndexesCursor,
+  ListSearchIndexesOptions,
   OptionalId,
   RunCommandOptions,
   SearchIndexDescription,
@@ -97,8 +98,8 @@ class DB {
    * @param collection name of the collection
    * @returns array of search indexes present in the collection
    */
-  listAllSearchIndexes(collection: string): ListSearchIndexesCursor {
-    return this.db.collection(collection).listSearchIndexes();
+  listAllSearchIndexes(collection: string, options: ListSearchIndexesOptions): ListSearchIndexesCursor {
+    return this.db.collection(collection).listSearchIndexes({ ...options, session: this.session});
   }
 
   /**
@@ -107,10 +108,13 @@ class DB {
    * @param name name of the search index
    * @returns search index if exists; else null
    */
-  async getSearchIndexByName(collection: string, name: string) {
-    const searchIndexes = await this.db.collection(collection).listSearchIndexes(name).toArray();
-    if(searchIndexes.length)
+  async getSearchIndexByName(collection: string, name: string, options: ListSearchIndexesOptions) {
+    const searchIndexes = await this.db.collection(collection).listSearchIndexes(name, { ...options, session: this.session}).toArray();
+    if(searchIndexes.length === 1)
       return searchIndexes[0];
+    if (searchIndexes.length > 1) {
+      throw new Error(`Multiple search indexes found with name: ${name}`);
+    }
     return null;
   }
 
