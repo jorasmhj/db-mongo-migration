@@ -109,12 +109,12 @@ class DB {
    * @param name name of the search index
    * @returns search index if exists; else null
    */
-  async getSearchIndexByName(collection: string, name: string, options: ListSearchIndexesOptions) {
-    const searchIndexes = await this.db.collection(collection).listSearchIndexes(name, { ...options, session: this.session}).toArray();
-    if(searchIndexes.length === 1)
+  async getSearchIndexByName(collection: string, name: string, options: ListSearchIndexesOptions): Promise<Document | null> {
+    const searchIndexes = await this.db.collection(collection).listSearchIndexes(name, options).toArray();
+    if (searchIndexes.length === 1)
       return searchIndexes[0];
     if (searchIndexes.length > 1) {
-      throw new Error(`Multiple search indexes found with name: ${name}`);
+      throw new Error(`Multiple search indexes found with name '${name}' in collection '${collection}'. This indicates a potential data integrity issue.`);
     }
     return null;
   }
