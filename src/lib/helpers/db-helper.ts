@@ -17,8 +17,10 @@ import {
   IndexDescription,
   IndexSpecification,
   InsertOneOptions,
+  ListSearchIndexesCursor,
   OptionalId,
   RunCommandOptions,
+  SearchIndexDescription,
   UpdateFilter,
   UpdateOptions,
   WithoutId
@@ -78,6 +80,57 @@ class DB {
 
   createIndexes(collection: string, indexSpecs: IndexDescription[], options?: CreateIndexesOptions) {
     return this.db.collection(collection).createIndexes(indexSpecs, { ...options, session: this.session })
+  }
+
+  /**
+   * Create an atlas or vector search for a collection
+   * @param collection name of the collection
+   * @param indexDescription { name: string, definition: document, type: 'search' | 'vectorsearch' }
+   * @returns name of the index created
+   */
+  createSearchIndex(collection: string, indexDescription: SearchIndexDescription): Promise<string> {
+    return this.db.collection(collection).createSearchIndex(indexDescription);
+  }
+
+  /**
+   * get all the search indexes in a collection
+   * @param collection name of the collection
+   * @returns array of search indexes present in the collection
+   */
+  listAllSearchIndexes(collection: string): ListSearchIndexesCursor {
+    return this.db.collection(collection).listSearchIndexes();
+  }
+
+  /**
+   * get search index information by name
+   * @param collection collection in which search index is to be searched
+   * @param name name of the search index
+   * @returns search index if exists; else null
+   */
+  async getSearchIndexByName(collection: string, name: string) {
+    const searchIndexes = await this.db.collection(collection).listSearchIndexes(name).toArray();
+    if(searchIndexes.length)
+      return searchIndexes[0];
+    return null;
+  }
+
+  /**
+   * update definition of a search index
+   * @param collection name of the collection
+   * @param name name of the search index to be updated
+   * @param definition new definition
+   */
+  updateSearchIndex(collection: string, name: string, definition: Document) {
+    return this.db.collection(collection).updateSearchIndex(name, definition);
+  }
+
+  /**
+   * delete a search index
+   * @param collection name of the collection
+   * @param name name of the search index to be deleted
+   */
+  deleteSearchIndex(collection: string, name: string) {
+    return this.db.collection(collection).dropSearchIndex(name);
   }
 
   aggregate(collection: string, pipeline?: Document[], options?: AggregateOptions) {
