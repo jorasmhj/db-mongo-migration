@@ -9,6 +9,7 @@ import {
   Db,
   DeleteOptions,
   Document,
+  DropIndexesOptions,
   Filter,
   FindOneAndDeleteOptions,
   FindOneAndReplaceOptions,
@@ -81,6 +82,14 @@ class DB {
 
   createIndexes(collection: string, indexSpecs: IndexDescription[], options?: CreateIndexesOptions) {
     return this.db.collection(collection).createIndexes(indexSpecs, { ...options, session: this.session })
+  }
+
+  dropIndex(collection: string, indexName: string, options?: DropIndexesOptions) {
+    return this.db.collection(collection).dropIndex(indexName, { ...options, session: this.session })
+  }
+
+  dropIndexes(collection: string, options?: DropIndexesOptions) {
+    return this.db.collection(collection).dropIndexes({ ...options, session: this.session })
   }
 
   /**
