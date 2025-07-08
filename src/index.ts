@@ -5,3 +5,5 @@ import { handleDbTransaction } from './lib/helpers/db-session-helper'
 import { IMigration, INativeMigration, IConfiguration, IDbConnection, IMigrationInfo, IMigrationOptions } from './interface'
 
 export { DB, MongoClient, IMigration, INativeMigration, IConfiguration, IDbConnection, IMigrationInfo, IMigrationOptions, handleDbTransaction, sleep }
+
+export test
