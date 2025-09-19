@@ -14,7 +14,7 @@ import configHelper from '../lib/helpers/config-helper'
 import { sleep } from '../lib/utils/common'
 
 const program = new Command()
-cool
+cool // commented out
 // const { projectName } = configHelper.readConfig()
 // const figletPrefix = projectName ? `${projectName}-` : ''
 
